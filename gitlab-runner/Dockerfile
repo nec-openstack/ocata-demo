@@ -1,3 +1,4 @@
+# docker build -t yuanying/gitlab-runner .
 FROM gitlab/gitlab-runner:latest
 MAINTAINER yuan-docker@fraction.jp
 

@@ -30,9 +30,7 @@ docker run -d --name gitlab-runner \
     --env="DOCKER_PRIVILEGED=true" \
     \
     --privileged \
-    --dns=10.10.10.10 \
-    --net='YOURNETWORK'  \
-    gitlab/gitlab-runner:latest
+    yuanying/gitlab-runner:latest
 
 docker service create --name gitlab-runner \
     --mode global \
