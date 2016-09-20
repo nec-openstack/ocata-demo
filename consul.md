@@ -4,8 +4,8 @@
 
     $ docker run -d --net=host --name consul-server \
         -e 'CONSUL_LOCAL_CONFIG={"skip_leave_on_interrupt": true}' \
-        consul agent -server -bind=192.168.204.21 -bootstrap-expect=1 \
-                     -ui -client=192.168.204.21
+        consul agent -server -bind=0.0.0.0 -advertise=192.168.204.21 \
+                    -bootstrap-expect=1 -ui
 
 ## Install consul-template
 
