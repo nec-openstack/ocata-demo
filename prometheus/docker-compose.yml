@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  consul_server:
+    restart: always
+    image: prom/prometheus
+    ports:
+    - "9090:9090"
+    volumes:
+    - /srv/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
