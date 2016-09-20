@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  consul_server:
+    restart: always
+    image: consul:latest
+    network_mode: "host"
+    command:
+    - agent -server -bootstrap-expect 1
