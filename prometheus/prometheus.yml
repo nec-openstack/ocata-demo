@@ -9,7 +9,7 @@ scrape_configs:
 - job_name: 'overwritten-default'
 
   consul_sd_configs:
-  - server:   '127.0.0.1:5361'
+  - server:   '127.0.0.1:8500'
     services: ['cadvisor', 'node-exporter']
 
   relabel_configs:
