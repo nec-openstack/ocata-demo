@@ -35,6 +35,7 @@
 ## node-exporter
 
     $ docker run -d -p 9100:9100 \
+        -e "SERVICE_NAME=node" \
         -v "/proc:/host/proc" \
         -v "/sys:/host/sys" \
         -v "/:/rootfs" \

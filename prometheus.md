@@ -18,8 +18,3 @@
     $ docker run -d -p 3000:3000 -v /tmp/prom:/tmp/prom \
         -e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
         prom/promdash
-
-## Install container exporter
-
-    $ docker run -p 8080:8080 -v /cgroup:/cgroup \
-        -v /var/run/docker.sock:/var/run/docker.sock prom/container-exporter
