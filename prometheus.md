@@ -7,6 +7,7 @@
         --detach=true \
         --name=prometheus \
         --net=host \
+        --restart always \
         prom/prometheus:latest
 
 ## Promdash
