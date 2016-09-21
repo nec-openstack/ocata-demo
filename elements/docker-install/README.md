@@ -8,5 +8,5 @@ export ELEMENTS_PATH=${ELEMENTS_PATH}:ocata-demo/elements
 
 diskimage-builder/bin/disk-image-create vm \
       ubuntu selinux-permissive \
-      docker-install \
+      docker \
       -o ubuntu-trusty-docker.qcow2
