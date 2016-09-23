@@ -43,7 +43,7 @@
         --name=node-exporter \
         prom/node-exporter \
         -collector.procfs /host/proc \
-        -collector.sysfs /host/proc \
+        -collector.sysfs /host/sys \
         -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"
 
 # Reference
