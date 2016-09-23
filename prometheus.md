@@ -2,6 +2,7 @@
 
     $ sudo mkdir /srv/docker/prometheus
     $ sudo cp prometheus/prometheus.yml /srv/docker/prometheus/prometheus.yml
+    $ sudo cp prometheus/alert.rules /srv/docker/prometheus/alert.rules
     $ docker run \
         --volume=/srv/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
         --volume=/srv/docker/prometheus/alert.rules:/etc/prometheus/alert.rules \
