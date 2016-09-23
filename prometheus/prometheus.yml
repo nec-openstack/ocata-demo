@@ -5,6 +5,9 @@ global:
   labels:
     monitor: 'web monitor'
 
+rule_files:
+  - "/etc/prometheus/alert.rules"
+
 scrape_configs:
 - job_name: 'overwritten-default'
 

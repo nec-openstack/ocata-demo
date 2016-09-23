@@ -10,10 +10,12 @@
 # Agent
 
     $ docker run -d --net=host --name consul-agent \
+        --restart always \
         -e 'CONSUL_BIND_INTERFACE=eth0' \
         -e 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}' \
         consul agent -join 192.168.204.21
     $ docker run -d \
+      --restart always \
       --name=registrator \
       --net=host \
       --volume=/var/run/docker.sock:/tmp/docker.sock \
@@ -23,6 +25,7 @@
 ## cAdvisor
 
     $ docker run \
+        --restart always \
         --volume=/:/rootfs:ro \
         --volume=/var/run:/var/run:rw \
         --volume=/sys:/sys:ro \
@@ -35,6 +38,7 @@
 ## node-exporter
 
     $ docker run -d -p 9100:9100 \
+        --restart always \
         -e "SERVICE_NAME=node" \
         -v "/proc:/host/proc" \
         -v "/sys:/host/sys" \

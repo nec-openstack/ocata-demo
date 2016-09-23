@@ -4,18 +4,23 @@
     $ sudo cp prometheus/prometheus.yml /srv/docker/prometheus/prometheus.yml
     $ docker run \
         --volume=/srv/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
+        --volume=/srv/docker/prometheus/alert.rules:/etc/prometheus/alert.rules \
         --detach=true \
         --name=prometheus \
         --net=host \
         --restart always \
-        prom/prometheus:latest
+        prom/prometheus:latest \
+        -alertmanager.url=http://localhost:9093 \
+        -config.file=/etc/prometheus/prometheus.yml \
+        -storage.local.path=/prometheus \
+        -web.console.libraries=/etc/prometheus/console_libraries \
+        -web.console.templates=/etc/prometheus/consoles
 
-## Promdash
+## Alertmanager
 
-    $ docker pull prom/promdash
-    $ docker run -v /tmp/prom:/tmp/prom \
-        -e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
-        prom/promdash ./bin/rake db:migrate
-    $ docker run -d -p 3000:3000 -v /tmp/prom:/tmp/prom \
-        -e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
-        prom/promdash
+    $ docker run \
+        --restart always \
+        --net=host \
+        --detach=true \
+        --name alertmanager \
+        prom/alertmanager:latest
