@@ -1,0 +1,117 @@
+heat_template_version: 2013-05-23
+
+parameters:
+  key_name:
+    type: string
+    default: test_key
+  image:
+    type: string
+    default: ubuntu-docker
+  flavor:
+    type: string
+    default: m1.small
+  public_network:
+    type: string
+    default: external
+    description: ID of public network.
+  network:
+    type: string
+    default: private
+    description: ID of private network
+  subnet:
+    type: string
+    default: private-subnet
+  security_group:
+    type: string
+    default: demo_security
+  swarm_server:
+    type: string
+    default: 15.0.0.13
+  swarm_port:
+    type: string
+    default: 2377
+  swarm_token:
+    type: string
+    default: SWMTKN-1-1nh3s3dmnfatszuxozwmn047jey8p1gzy8o81l9w8qt254y8dw-68jwzvxnjtzi8a470d3un2e7d
+  consul_agent:
+    type: string
+    default: consul_agent
+  consul_registrator:
+    type: string
+    default: consul_registrator
+
+resources:
+  my_instance:
+    type: OS::Nova::Server
+    properties:
+      key_name: { get_param: key_name }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      name: worker
+      networks:
+        - port: { get_resource: inst1_port }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash
+            sudo docker swarm join --token $swarm_token $swarm_server:$swarm_port
+            # install consul agent
+            sudo docker run -d -net=host --name $consul_agent \
+                -e 'CONSUL_BIND_INTERFACE=eth0' \
+                -e 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}' \
+                consul agent -join $swarm_server
+            # install consul registrator
+            sudo docker run -d \
+              --name=$consul_registrator \
+              --net=host \
+              --volume=/var/run/docker.sock:/tmp/docker.sock \
+              gliderlabs/registrator:latest \
+              consul://localhost:8500
+            # install cAdvisor
+            sudo docker run \
+              --volume=/:/rootfs:ro \
+              --volume=/var/run:/var/run:rw \
+              --volume=/sys:/sys:ro \
+              --volume=/var/lib/docker/:/var/lib/docker:ro \
+              --publish=8080:8080 \
+              --detach=true \
+              --name=cadvisor \
+              google/cadvisor:latest
+            # install node-exporter
+              sudo docker run -d -e "SERVICE_NAME=node" \
+                -v "/proc:/host/proc" \
+                -v "/sys:/host/sys" \
+                -v "/:/rootfs" \
+                --net="host" \
+                --name=node-exporter \
+                prom/node-exporter \
+                -collector.procfs /host/proc \
+                -collector.sysfs /host/sys \
+                -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"
+          params:
+            $swarm_token: { get_param: swarm_token }
+            $swarm_server: { get_param: swarm_server }
+            $swarm_port: { get_param: swarm_port }
+            $consul_agent: { get_param: consul_agent }
+            $consul_registrator: { get_param: consul_registrator }
+
+  inst1_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network }
+      fixed_ips:
+        - subnet: { get_param: subnet }
+      security_groups: [{get_param: security_group }]
+
+  inst1_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+      port_id: { get_resource: inst1_port }
+      fixed_ip_address: {get_attr: [inst1_port, fixed_ips, 0, ip_address]}
+
+outputs:
+  floating_ip:
+    value: { get_attr: [ inst1_floating_ip, floating_ip_address ] }
+    description: The floatingip assigned to the instance.
