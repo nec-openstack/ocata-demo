@@ -32,6 +32,7 @@
 
     $ sudo mkdir /srv/docker/prometheus
     $ sudo cp prometheus/prometheus.yml /srv/docker/prometheus/prometheus.yml
+    $ sudo sed -i "s/127.0.0.1/consul-agent/g" /srv/docker/prometheus/prometheus.yml
     $ sudo cp prometheus/alert.rules /srv/docker/prometheus/alert.rules
     $ docker service create \
         -p 9090:9090 \
