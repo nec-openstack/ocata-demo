@@ -177,13 +177,14 @@ resources:
     properties:
       parts:
         - config: {get_resource: write_heat_params}
-        - config: {get_resource: configure_proxy}
+        - config: {get_resource: configure_docker}
         - config: {get_resource: install_consul_server}
         - config: {get_resource: install_registrator}
         - config: {get_resource: install_cadvisor}
         - config: {get_resource: install_node_exporter}
-        - config: {get_resource: write_prometheus_configs}
         - config: {get_resource: install_prometheus}
+        - config: {get_resource: install_docker_compose}
+        - config: {get_resource: install_gitlab}
         - config: {get_resource: master_wc_notify}
 
   ## Server and port
