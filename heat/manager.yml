@@ -235,6 +235,11 @@ outputs:
       Fixed subnet for swarm cluster
 
   swarm_worker_token:
-    value: { get_attr: [master_wait_condition, data]}
+    value: { get_attr: [master_wait_condition, data, '1']}
     description: >
       Join token for worker
+
+  swarm_manager_token:
+    value: { get_attr: [master_wait_condition, data, '2']}
+    description: >
+      Join token for manager

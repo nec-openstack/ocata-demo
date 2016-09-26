@@ -13,3 +13,4 @@ SWARM_WORKER_TOKEN=`docker swarm join-token -q worker`
 SWARM_MANAGER_TOKEN=`docker swarm join-token -q manager`
 
 sh -c "$WAIT_CURL --data-binary '{\"status\": \"SUCCESS\",\"data\": \"${SWARM_WORKER_TOKEN}\"}'"
+sh -c "$WAIT_CURL --data-binary '{\"status\": \"SUCCESS\",\"data\": \"${SWARM_MANAGER_TOKEN}\"}'"
