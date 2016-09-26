@@ -234,11 +234,6 @@ outputs:
     description: >
       Fixed subnet for swarm cluster
 
-  swarm_token:
-    value: { get_attr: [master_wait_condition, data]}
-    description: >
-      Swarm tokens to join cluster
-
   swarm_worker_token:
     value: {'Fn::Select': ['worker', { get_attr: [master_wait_condition, data]}]}
     description: >
