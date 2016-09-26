@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. /etc/sysconfig/heat-params
+
+PROMETHEUS_CONF_DIR="/srv/docker/prometheus"
+PROMETHEUS_CONF=${PROMETHEUS_CONF_DIR}/prometheus.yml
+PROMETHEUS_ALERT_CONF=${PROMETHEUS_CONF_DIR}/alert.rules
+
+mkdir -p ${PROMETHEUS_CONF_DIR}
+
+echo > ${PROMETHEUS_CONF} <<EOF
+$PROMETHEUS_CONFIG
+EOF
+
+echo > ${PROMETHEUS_ALERT_CONF} <<EOF
+$PROMETHEUS_ALERT_CONFIG
+EOF

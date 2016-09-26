@@ -145,7 +145,7 @@ resources:
       group: ungrouped
       config:
         str_replace:
-          template: {get_file: fragments/write-prometheus-conf.yml}
+          template: {get_file: fragments/write-prometheus-conf.sh}
           params:
             "$PROMETHEUS_CONFIG": {get_file: '../prometheus/prometheus.yml'}
             "$PROMETHEUS_ALERT_CONFIG": {get_file: '../prometheus/alert.rules'}
