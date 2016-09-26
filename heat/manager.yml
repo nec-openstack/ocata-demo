@@ -240,11 +240,11 @@ outputs:
       Swarm tokens to join cluster
 
   swarm_worker_token:
-    value: { get_attr: [master_wait_condition, data, worker]}
+    value: {'Fn::Select': ['worker', { get_attr: [master_wait_condition, data]}]}
     description: >
       Swarm worker tokens to join cluster
 
   swarm_manager_token:
-    value: { get_attr: [master_wait_condition, data, manager]}
+    value: {'Fn::Select': ['manager', { get_attr: [master_wait_condition, data]}]}
     description: >
       Swarm worker tokens to join cluster
