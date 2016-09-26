@@ -109,11 +109,11 @@ resources:
             "$HTTP_PROXY": {get_param: http_proxy}
             "$HTTPS_PROXY": {get_param: https_proxy}
 
-  configure_proxy:
+  configure_docker:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
-      config: {get_file: fragments/00-proxy.sh}
+      config: {get_file: fragments/00-configure-docker.sh}
 
   install_consul_server:
     type: OS::Heat::SoftwareConfig
