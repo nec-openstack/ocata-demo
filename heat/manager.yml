@@ -1,0 +1,230 @@
+heat_template_version: 2013-05-23
+
+parameters:
+
+  ## Required parameters
+
+  key_name:
+    type: string
+    default: test_key
+
+  external_network:
+    type: string
+    description: uuid/name of a network to use for floating ip addresses
+    default: public
+
+  image:
+    type: string
+    default: ubuntu-docker
+
+  flavor:
+    type: string
+    default: m1.small
+
+  http_proxy:
+    type: string
+    default: ""
+
+  https_proxy:
+    type: string
+    default: ""
+
+  ## Optional parameters
+
+  dns_nameserver:
+    type: string
+    description: address of a DNS nameserver reachable in your environment
+    default: 8.8.8.8
+
+  fixed_network_cidr:
+    type: string
+    description: network range for fixed ip network
+    default: 10.0.0.0/24
+
+  wait_condition_timeout:
+    type: number
+    description: >
+      timeout for the Wait Conditions
+    default: 6000
+
+resources:
+
+  ## Network resources
+
+  fixed_network:
+    type: OS::Neutron::Net
+
+  fixed_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      cidr: {get_param: fixed_network_cidr}
+      network: {get_resource: fixed_network}
+      dns_nameservers:
+        - {get_param: dns_nameserver}
+
+  extrouter:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info:
+        network: {get_param: external_network}
+
+  extrouter_inside:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: {get_resource: extrouter}
+      subnet: {get_resource: fixed_subnet}
+
+  ## Security group
+
+  secgroup_default:
+    type: "OS::Neutron::SecurityGroup"
+    properties:
+      rules:
+        - protocol: icmp
+        - protocol: tcp
+        - protocol: udp
+
+  ## Init
+
+  master_wait_handle:
+    type: OS::Heat::WaitConditionHandle
+
+  master_wait_condition:
+    type: OS::Heat::WaitCondition
+    depends_on: kube_master
+    properties:
+      handle: {get_resource: master_wait_handle}
+      timeout: {get_param: wait_condition_timeout}
+
+  write_heat_params:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          template: {get_file: fragments/write-heat-params-manager.yaml}
+          params:
+            "$MANAGER_IP": {get_attr: [swarm_master_eth0, fixed_ips, 0, ip_address]}
+            "$WAIT_CURL": {get_attr: [master_wait_handle, curl_cli]}
+            "$HTTP_PROXY": {get_param: http_proxy}
+            "$HTTPS_PROXY": {get_param: https_proxy}
+
+  configure_proxy:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/00-proxy.sh}
+
+  install_consul_server:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/00-install-consul-server.sh}
+
+  install_registrator:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/20-install-registrator.sh}
+
+  install_cadvisor:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/30-install-cadvisor.sh}
+
+  install_node_exporter:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/40-install-node-exporter.sh}
+
+  write_prometheus_configs:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/write-prometheus-conf.yml}
+
+  install_prometheus:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/50-install-prometheus.sh}
+
+  master_wc_notify:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/wc-notify-master.sh}
+
+  swarm_master_init:
+    type: "OS::Heat::MultipartMime"
+    properties:
+      parts:
+        - config: {get_resource: write_heat_params}
+        - config: {get_resource: configure_proxy}
+        - config: {get_resource: install_consul_server}
+        - config: {get_resource: install_registrator}
+        - config: {get_resource: install_cadvisor}
+        - config: {get_resource: install_node_exporter}
+        - config: {get_resource: write_prometheus_configs}
+        - config: {get_resource: install_prometheus}
+        - config: {get_resource: master_wc_notify}
+
+  ## Server and port
+
+  swarm_master:
+    type: "OS::Nova::Server"
+    properties:
+      image:
+        get_param: image
+      flavor:
+        get_param: flavor
+      key_name:
+        get_param: key_name
+      user_data_format: RAW
+      user_data: {get_resource: swarm_master_init}
+      networks:
+        - port:
+            get_resource: swarm_master_eth0
+
+  swarm_master_eth0:
+    type: "OS::Neutron::Port"
+    properties:
+      network_id:
+        get_resource: fixed_network
+      security_groups:
+        - {get_resource: secgroup_default}
+      fixed_ips:
+        - subnet_id:
+            get_resource: fixed_subnet
+
+  swarm_master_floating:
+    type: "OS::Neutron::FloatingIP"
+    properties:
+      floating_network:
+        get_param: external_network
+      port_id:
+        get_resource: swarm_master_eth0
+
+outputs:
+
+  floating_ip:
+    value: {get_attr: [swarm_master_floating, floating_ip_address]}
+    description: >
+      This is the "public" ip addresses of Swarm master.
+
+  fixed_ip:
+    value: {get_attr: [swarm_master_eth0, fixed_ips, 0, ip_address]}
+    description: >
+      This is the "private" ip addresses of Swarm master.
+
+  security_group:
+    value: { get_resource: secgroup_default }
+    description: >
+      Security group id
+
+  fixed_subnet:
+    value: { get_resource: fixed_subnet }
+    description: >
+      Fixed subnet for swarm cluster

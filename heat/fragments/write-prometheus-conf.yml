@@ -1,0 +1,11 @@
+#cloud-config
+merge_how: dict(recurse_array)+list(append)
+write_files:
+  - path: /srv/docker/prometheus/prometheus.yml
+    owner: "root:root"
+    permissions: "0644"
+    content: {get_file: ../../prometheus/prometheus.yml}
+  - path: /srv/docker/prometheus/alert.rules
+    owner: "root:root"
+    permissions: "0644"
+    content: {get_file: ../../prometheus/alert.rules}

@@ -58,11 +58,13 @@ resources:
             sudo docker swarm join --token $swarm_token $swarm_server:$swarm_port
             # install consul agent
             sudo docker run -d -net=host --name $consul_agent \
-                -e 'CONSUL_BIND_INTERFACE=eth0' \
-                -e 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}' \
-                consul agent -join $swarm_server
+              --restart always \
+              -e 'CONSUL_BIND_INTERFACE=eth0' \
+              -e 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}' \
+              consul agent -join $swarm_server
             # install consul registrator
             sudo docker run -d \
+              --restart always \
               --name=$consul_registrator \
               --net=host \
               --volume=/var/run/docker.sock:/tmp/docker.sock \
@@ -70,6 +72,7 @@ resources:
               consul://localhost:8500
             # install cAdvisor
             sudo docker run \
+              --restart always \
               --volume=/:/rootfs:ro \
               --volume=/var/run:/var/run:rw \
               --volume=/sys:/sys:ro \
@@ -79,16 +82,17 @@ resources:
               --name=cadvisor \
               google/cadvisor:latest
             # install node-exporter
-              sudo docker run -d -e "SERVICE_NAME=node" \
-                -v "/proc:/host/proc" \
-                -v "/sys:/host/sys" \
-                -v "/:/rootfs" \
-                --net="host" \
-                --name=node-exporter \
-                prom/node-exporter \
-                -collector.procfs /host/proc \
-                -collector.sysfs /host/sys \
-                -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"
+            sudo docker run -d -e "SERVICE_NAME=node" \
+              --restart always \
+              -v "/proc:/host/proc" \
+              -v "/sys:/host/sys" \
+              -v "/:/rootfs" \
+              --net="host" \
+              --name=node-exporter \
+              prom/node-exporter \
+              -collector.procfs /host/proc \
+              -collector.sysfs /host/sys \
+              -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"
           params:
             $swarm_token: { get_param: swarm_token }
             $swarm_server: { get_param: swarm_server }
