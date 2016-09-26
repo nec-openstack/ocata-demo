@@ -36,7 +36,7 @@ parameters:
     description: address of a DNS nameserver reachable in your environment
     default: 8.8.8.8
 
-  fixed_network_cidr:
+  network_cidr:
     type: string
     description: network range for fixed ip network
     default: 10.0.0.0/24
@@ -51,14 +51,14 @@ resources:
 
   ## Network resources
 
-  fixed_network:
+  network:
     type: OS::Neutron::Net
 
-  fixed_subnet:
+  subnet:
     type: OS::Neutron::Subnet
     properties:
-      cidr: {get_param: fixed_network_cidr}
-      network: {get_resource: fixed_network}
+      cidr: {get_param: network_cidr}
+      network: {get_resource: network}
       dns_nameservers:
         - {get_param: dns_nameserver}
 
@@ -72,7 +72,7 @@ resources:
     type: OS::Neutron::RouterInterface
     properties:
       router_id: {get_resource: extrouter}
-      subnet: {get_resource: fixed_subnet}
+      subnet: {get_resource: subnet}
 
   ## Security group
 
@@ -197,12 +197,12 @@ resources:
     type: "OS::Neutron::Port"
     properties:
       network_id:
-        get_resource: fixed_network
+        get_resource: network
       security_groups:
         - {get_resource: secgroup_default}
       fixed_ips:
         - subnet_id:
-            get_resource: fixed_subnet
+            get_resource: subnet
 
   swarm_master_floating:
     type: "OS::Neutron::FloatingIP"
@@ -229,8 +229,13 @@ outputs:
     description: >
       Security group id
 
-  fixed_subnet:
-    value: { get_resource: fixed_subnet }
+  network:
+    value: { get_resource: network }
+    description: >
+      Fixed network for swarm cluster
+
+  subnet:
+    value: { get_resource: subnet }
     description: >
       Fixed subnet for swarm cluster
 
