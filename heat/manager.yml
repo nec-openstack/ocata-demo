@@ -147,8 +147,8 @@ resources:
         str_replace:
           template: {get_file: fragments/write-prometheus-conf.yml}
           params:
-            "$PROMETHEUS_CONFIG": {get_file: '../../prometheus/prometheus.yml'}
-            "$PROMETHEUS_ALERT_CONFIG": {get_file: '../../prometheus/alert.rules'}
+            "$PROMETHEUS_CONFIG": {get_file: '../prometheus/prometheus.yml'}
+            "$PROMETHEUS_ALERT_CONFIG": {get_file: '../prometheus/alert.rules'}
 
   install_prometheus:
     type: OS::Heat::SoftwareConfig
