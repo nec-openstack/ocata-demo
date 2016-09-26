@@ -233,3 +233,13 @@ outputs:
     value: { get_resource: fixed_subnet }
     description: >
       Fixed subnet for swarm cluster
+
+  swarm_worker_token:
+    value: { get_attr: [master_wait_condition, worker]}
+    description: >
+      Join token for worker
+
+  swarm_manager_token:
+    value: { get_attr: [master_wait_condition, manager]}
+    description: >
+      Join token for manager
