@@ -10,7 +10,8 @@
     diskimage-builder/bin/disk-image-create vm \
           ubuntu selinux-permissive \
           docker-install \
-          demo-docker-images-pull \
+          pip-and-virtualenv \
+          demo-dependencies \
           -o ubuntu-trusty-docker.qcow2
 
     glance image-create --name ubuntu-docker \
