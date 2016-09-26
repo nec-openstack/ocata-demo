@@ -91,7 +91,7 @@ resources:
 
   master_wait_condition:
     type: OS::Heat::WaitCondition
-    depends_on: kube_master
+    depends_on: swarm_master
     properties:
       handle: {get_resource: master_wait_handle}
       timeout: {get_param: wait_condition_timeout}
