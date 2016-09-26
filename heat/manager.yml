@@ -139,22 +139,32 @@ resources:
       group: ungrouped
       config: {get_file: fragments/40-install-node-exporter.sh}
 
-  write_prometheus_configs:
+  install_prometheus:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
       config:
         str_replace:
-          template: {get_file: fragments/write-prometheus-conf.sh}
+          template: {get_file: fragments/50-install-prometheus.sh}
           params:
             "$PROMETHEUS_CONFIG": {get_file: '../prometheus/prometheus.yml'}
             "$PROMETHEUS_ALERT_CONFIG": {get_file: '../prometheus/alert.rules'}
 
-  install_prometheus:
+  install_docker_compose:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
-      config: {get_file: fragments/50-install-prometheus.sh}
+      config: {get_file: fragments/60-install-docker-compose.sh}
+
+  install_gitlab:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          template: {get_file: fragments/70-install-gitlab.sh}
+          params:
+            "$GITLAB_DOCKER_COMPOSE": {get_file: '../gitlab/docker-compose.yml'}
 
   master_wc_notify:
     type: OS::Heat::SoftwareConfig
