@@ -1,0 +1,7 @@
+parameters:
+  key_name: default
+  image: ubuntu-docker
+  flavor: m1.small
+  dns_nameserver: 8.8.8.8
+  http_proxy: ""
+  https_proxy: ""

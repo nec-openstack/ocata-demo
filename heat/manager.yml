@@ -6,7 +6,7 @@ parameters:
 
   key_name:
     type: string
-    default: test_key
+    default: default
 
   external_network:
     type: string
