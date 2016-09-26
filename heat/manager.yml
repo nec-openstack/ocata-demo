@@ -104,6 +104,7 @@ resources:
         str_replace:
           template: {get_file: fragments/write-heat-params-manager.yaml}
           params:
+            "$MANAGER_IP_PUBLIC": {get_attr: [swarm_master_floating, floating_ip_address]}
             "$MANAGER_IP": {get_attr: [swarm_master_eth0, fixed_ips, 0, ip_address]}
             "$WAIT_CURL": {get_attr: [master_wait_handle, curl_cli]}
             "$HTTP_PROXY": {get_param: http_proxy}

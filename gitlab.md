@@ -9,7 +9,7 @@
     $ cd ocata-demo/gitlab
     $ # replace host name to actual host name
     $ export GITLAB_HOST=192.168.204.21
-    $ sed -i "s/$MANAGER_IP/${GITLAB_HOST}/g" ./docker-compose.yml
+    $ sed -i "s/__GITLAB_HOST__/${GITLAB_HOST}/g" ./docker-compose.yml
     $ docker-compose up -d
 
 # Run gitlab runner

@@ -5,6 +5,7 @@ write_files:
     owner: "root:root"
     permissions: "0644"
     content: |
+      MANAGER_IP_PUBLIC="$MANAGER_IP_PUBLIC"
       MANAGER_IP="$MANAGER_IP"
       WAIT_CURL="$WAIT_CURL"
       HTTP_PROXY="$HTTP_PROXY"
