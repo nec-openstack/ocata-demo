@@ -4,8 +4,8 @@ write_files:
   - path: /srv/docker/prometheus/prometheus.yml
     owner: "root:root"
     permissions: "0644"
-    content: {get_file: ../../prometheus/prometheus.yml}
+    content: $PROMETHEUS_CONFIG
   - path: /srv/docker/prometheus/alert.rules
     owner: "root:root"
     permissions: "0644"
-    content: {get_file: ../../prometheus/alert.rules}
+    content: $PROMETHEUS_ALERT_CONFIG
