@@ -6,4 +6,8 @@
 #     echo "Waiting for Kubernetes API..."
 #     sleep 5
 # done
-$WAIT_CURL --data-binary '{"status": "SUCCESS"}'
+
+SWARM_WORKER_TOKEN=`docker swarm join-token -q worker`
+SWARM_MANAGER_TOKEN=`docker swarm join-token -q manager`
+
+$WAIT_CURL --data-binary '{"status": "SUCCESS","worker": "${SWARM_WORKER_TOKEN}", "manager": "${SWARM_MANAGER_TOKEN}"}'
