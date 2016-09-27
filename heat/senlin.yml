@@ -1,0 +1,114 @@
+heat_template_version: 2015-04-30
+
+parameters:
+
+  key_name:
+    type: string
+    default: default
+
+  external_network:
+    type: string
+    default: external
+    description: ID of public network.
+
+  http_proxy:
+    type: string
+    default: ""
+
+  https_proxy:
+    type: string
+    default: ""
+
+  senlin_image:
+    type: string
+    default: senlin-server
+
+  senlin_flavor:
+    type: string
+    default: m2.medium
+
+  network:
+    type: string
+    default: private
+    description: ID of private network
+
+  subnet:
+    type: string
+    default: private-subnet
+
+  security_group:
+    type: string
+    default: demo_security
+
+resources:
+
+  # Init
+
+  write_heat_params:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          template: {get_file: fragments/write-heat-params.yaml}
+          params:
+            "$HTTP_PROXY": {get_param: http_proxy}
+            "$HTTPS_PROXY": {get_param: https_proxy}
+
+  configure_proxy:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/00-configure-proxy.sh}
+
+  senlin_init:
+    type: "OS::Heat::MultipartMime"
+    properties:
+      parts:
+        - config: {get_resource: write_heat_params}
+        - config: {get_resource: configure_proxy}
+
+  ## Server and port
+
+  senlin:
+    type: "OS::Nova::Server"
+    properties:
+      image:
+        get_param: senlin_image
+      flavor:
+        get_param: senlin_flavor
+      key_name:
+        get_param: key_name
+      user_data_format: RAW
+      user_data: {get_resource: senlin_init}
+      networks:
+        - port:
+            get_resource: senlin_eth0
+
+  senlin_eth0:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network }
+      fixed_ips:
+        - subnet: { get_param: subnet }
+      security_groups: [{get_param: security_group }]
+
+  senlin_floating:
+    type: "OS::Neutron::FloatingIP"
+    properties:
+      floating_network:
+        get_param: external_network
+      port_id:
+        get_resource: senlin_eth0
+
+outputs:
+
+  floating_ip:
+    value: {get_attr: [senlin_floating, floating_ip_address]}
+    description: >
+      This is the "public" ip addresses of senlin vm.
+
+  fixed_ip:
+    value: {get_attr: [senlin_eth0, fixed_ips, 0, ip_address]}
+    description: >
+      This is the "private" ip addresses of senlin vm.

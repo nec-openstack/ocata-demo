@@ -1,0 +1,114 @@
+heat_template_version: 2015-04-30
+
+parameters:
+
+  key_name:
+    type: string
+    default: default
+
+  external_network:
+    type: string
+    default: external
+    description: ID of public network.
+
+  http_proxy:
+    type: string
+    default: ""
+
+  https_proxy:
+    type: string
+    default: ""
+
+  inception_image:
+    type: string
+    default: ubuntu-docker
+
+  inception_flavor:
+    type: string
+    default: m2.small
+
+  network:
+    type: string
+    default: private
+    description: ID of private network
+
+  subnet:
+    type: string
+    default: private-subnet
+
+  security_group:
+    type: string
+    default: demo_security
+
+resources:
+
+  # Init
+
+  write_heat_params:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          template: {get_file: fragments/write-heat-params.yaml}
+          params:
+            "$HTTP_PROXY": {get_param: http_proxy}
+            "$HTTPS_PROXY": {get_param: https_proxy}
+
+  configure_proxy:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/00-configure-proxy.sh}
+
+  inception_init:
+    type: "OS::Heat::MultipartMime"
+    properties:
+      parts:
+        - config: {get_resource: write_heat_params}
+        - config: {get_resource: configure_proxy}
+
+  ## Server and port
+
+  inception:
+    type: "OS::Nova::Server"
+    properties:
+      image:
+        get_param: inception_image
+      flavor:
+        get_param: inception_flavor
+      key_name:
+        get_param: key_name
+      user_data_format: RAW
+      user_data: {get_resource: inception_init}
+      networks:
+        - port:
+            get_resource: inception_eth0
+
+  inception_eth0:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network }
+      fixed_ips:
+        - subnet: { get_param: subnet }
+      security_groups: [{get_param: security_group }]
+
+  inception_floating:
+    type: "OS::Neutron::FloatingIP"
+    properties:
+      floating_network:
+        get_param: external_network
+      port_id:
+        get_resource: inception_eth0
+
+outputs:
+
+  floating_ip:
+    value: {get_attr: [inception_floating, floating_ip_address]}
+    description: >
+      This is the "public" ip addresses of inception vm.
+
+  fixed_ip:
+    value: {get_attr: [inception_eth0, fixed_ips, 0, ip_address]}
+    description: >
+      This is the "private" ip addresses of inception vm.

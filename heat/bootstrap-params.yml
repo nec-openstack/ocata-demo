@@ -1,0 +1,10 @@
+parameters:
+  key_name: default
+  external_network: public
+  inception_image: ubuntu-docker
+  inception_flavor: m1.small
+  senlin_image: senlin-server
+  senlin_flavor: m1.small
+  dns_nameserver: 8.8.8.8
+  http_proxy: ""
+  https_proxy: ""
