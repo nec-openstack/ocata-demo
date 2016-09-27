@@ -25,4 +25,5 @@
       --env="DOCKER_VOLUMES=/ci" \
       --env="DOCKER_PRIVILEGED=true" \
       --network ingress \
+      --constraint 'node.role != manager' \
       yuanying/gitlab-runner
