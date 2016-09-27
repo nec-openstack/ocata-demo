@@ -92,7 +92,7 @@ resources:
   # inception vm
 
   inception:
-    type: "inception.yml"
+    type: "inception.yaml"
     properties:
         key_name: {get_param: key_name}
         external_network: {get_param: external_network}
@@ -107,7 +107,7 @@ resources:
   # senlin server
 
   senlin:
-    type: "senlin.yml"
+    type: "senlin.yaml"
     properties:
         key_name: {get_param: key_name}
         external_network: {get_param: external_network}
