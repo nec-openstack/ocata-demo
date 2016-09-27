@@ -39,7 +39,7 @@ parameters:
   network_cidr:
     type: string
     description: network range for fixed ip network
-    default: 10.0.0.0/24
+    default: 10.0.4.0/24
 
   wait_condition_timeout:
     type: number
@@ -53,10 +53,13 @@ resources:
 
   network:
     type: OS::Neutron::Net
+    properties:
+      name: swarm-net
 
   subnet:
     type: OS::Neutron::Subnet
     properties:
+      name: swarm-subnet
       cidr: {get_param: network_cidr}
       network: {get_resource: network}
       dns_nameservers:
