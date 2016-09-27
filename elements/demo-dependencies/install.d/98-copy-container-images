@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
+mkdir -p $CONTAINER_TAR_DIRECTORY
+
+mv /tmp/consul.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/cadvisor.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/node-exporter.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/prometheus.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/alertmanager.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/ubuntu-ruby.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/redis.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/postgresql.tar $CONTAINER_TAR_DIRECTORY
+mv /tmp/gitlab.tar $CONTAINER_TAR_DIRECTORY
