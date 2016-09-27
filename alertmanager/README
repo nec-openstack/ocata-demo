@@ -1,0 +1,13 @@
+## Create a profile(pro_worker) for docker-worker
+ # Using worker template(../heat/work.yml)
+
+## Create a cluster
+ $ senlin cluster-create -p pro_worker cluster_con
+
+## Create a receiver and bond it to CLUSTER_SCALE_OUT action
+ $ senlin receiver-create -c cluster_con -a CLUSTER_SCALE_OUT rec_out
+
+## Got the webhook url from receiver
+ $ senlin receiver-show rec_out
+
+## Configure the webhook url to altermanager.conf
