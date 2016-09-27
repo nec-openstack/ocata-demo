@@ -10,7 +10,7 @@ parameters:
   flavor:
     type: string
     default: m1.small
-  public_network:
+  external_network:
     type: string
     default: external
     description: ID of public network.
@@ -35,13 +35,13 @@ parameters:
     default: SWMTKN-1-1nh3s3dmnfatszuxozwmn047jey8p1gzy8o81l9w8qt254y8dw-68jwzvxnjtzi8a470d3un2e7d
   consul_agent:
     type: string
-    default: consul_agent
+    default: consul-agent
   consul_registrator:
     type: string
-    default: consul_registrator
+    default: registrator
 
 resources:
-  my_instance:
+  swarm_worker:
     type: OS::Nova::Server
     properties:
       key_name: { get_param: key_name }
@@ -49,7 +49,7 @@ resources:
       flavor: { get_param: flavor }
       name: worker
       networks:
-        - port: { get_resource: inst1_port }
+        - port: { get_resource: swarm_worker_eth0 }
       user_data_format: RAW
       user_data:
         str_replace:
@@ -100,7 +100,7 @@ resources:
             $consul_agent: { get_param: consul_agent }
             $consul_registrator: { get_param: consul_registrator }
 
-  inst1_port:
+  swarm_worker_eth0:
     type: OS::Neutron::Port
     properties:
       network: { get_param: network }
@@ -108,14 +108,14 @@ resources:
         - subnet: { get_param: subnet }
       security_groups: [{get_param: security_group }]
 
-  inst1_floating_ip:
+  swarm_worker_floating:
     type: OS::Neutron::FloatingIP
     properties:
-      floating_network: { get_param: public_network }
-      port_id: { get_resource: inst1_port }
-      fixed_ip_address: {get_attr: [inst1_port, fixed_ips, 0, ip_address]}
+      floating_network: { get_param: external_network }
+      port_id: { get_resource: swarm_worker_eth0 }
+      fixed_ip_address: {get_attr: [swarm_worker_eth0, fixed_ips, 0, ip_address]}
 
 outputs:
   floating_ip:
-    value: { get_attr: [ inst1_floating_ip, floating_ip_address ] }
+    value: { get_attr: [ swarm_worker_floating, floating_ip_address ] }
     description: The floatingip assigned to the instance.

@@ -1,5 +1,5 @@
 ALERT HighMemoryAlert
-  IF csum((node_memory_MemTotal - node_memory_MemFree) / 1024 / 1024) / sum(up{job="node"}) > 500
+  IF sum((node_memory_MemTotal - node_memory_MemFree) / 1024 / 1024) / sum(up{job="node"}) > 500
   FOR 1m
   LABELS {}
   ANNOTATIONS {

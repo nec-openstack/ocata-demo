@@ -36,7 +36,7 @@ parameters:
     description: address of a DNS nameserver reachable in your environment
     default: 8.8.8.8
 
-  fixed_network_cidr:
+  network_cidr:
     type: string
     description: network range for fixed ip network
     default: 10.0.0.0/24
@@ -51,14 +51,14 @@ resources:
 
   ## Network resources
 
-  fixed_network:
+  network:
     type: OS::Neutron::Net
 
-  fixed_subnet:
+  subnet:
     type: OS::Neutron::Subnet
     properties:
-      cidr: {get_param: fixed_network_cidr}
-      network: {get_resource: fixed_network}
+      cidr: {get_param: network_cidr}
+      network: {get_resource: network}
       dns_nameservers:
         - {get_param: dns_nameserver}
 
@@ -72,7 +72,7 @@ resources:
     type: OS::Neutron::RouterInterface
     properties:
       router_id: {get_resource: extrouter}
-      subnet: {get_resource: fixed_subnet}
+      subnet: {get_resource: subnet}
 
   ## Security group
 
@@ -91,7 +91,7 @@ resources:
 
   master_wait_condition:
     type: OS::Heat::WaitCondition
-    depends_on: kube_master
+    depends_on: swarm_master
     properties:
       handle: {get_resource: master_wait_handle}
       timeout: {get_param: wait_condition_timeout}
@@ -104,16 +104,17 @@ resources:
         str_replace:
           template: {get_file: fragments/write-heat-params-manager.yaml}
           params:
+            "$MANAGER_IP_PUBLIC": {get_attr: [swarm_master_floating, floating_ip_address]}
             "$MANAGER_IP": {get_attr: [swarm_master_eth0, fixed_ips, 0, ip_address]}
             "$WAIT_CURL": {get_attr: [master_wait_handle, curl_cli]}
             "$HTTP_PROXY": {get_param: http_proxy}
             "$HTTPS_PROXY": {get_param: https_proxy}
 
-  configure_proxy:
+  configure_docker:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
-      config: {get_file: fragments/00-proxy.sh}
+      config: {get_file: fragments/00-configure-docker.sh}
 
   install_consul_server:
     type: OS::Heat::SoftwareConfig
@@ -139,17 +140,32 @@ resources:
       group: ungrouped
       config: {get_file: fragments/40-install-node-exporter.sh}
 
-  write_prometheus_configs:
-    type: OS::Heat::SoftwareConfig
-    properties:
-      group: ungrouped
-      config: {get_file: fragments/write-prometheus-conf.yml}
-
   install_prometheus:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
-      config: {get_file: fragments/50-install-prometheus.sh}
+      config:
+        str_replace:
+          template: {get_file: fragments/50-install-prometheus.sh}
+          params:
+            "$PROMETHEUS_CONFIG": {get_file: '../prometheus/prometheus.yml'}
+            "$PROMETHEUS_ALERT_CONFIG": {get_file: '../prometheus/alert.rules'}
+
+  install_docker_compose:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: fragments/60-install-docker-compose.sh}
+
+  install_gitlab:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          template: {get_file: fragments/70-install-gitlab.sh}
+          params:
+            "$GITLAB_DOCKER_COMPOSE": {get_file: '../gitlab/docker-compose.yml'}
 
   master_wc_notify:
     type: OS::Heat::SoftwareConfig
@@ -162,13 +178,14 @@ resources:
     properties:
       parts:
         - config: {get_resource: write_heat_params}
-        - config: {get_resource: configure_proxy}
+        - config: {get_resource: configure_docker}
         - config: {get_resource: install_consul_server}
         - config: {get_resource: install_registrator}
         - config: {get_resource: install_cadvisor}
         - config: {get_resource: install_node_exporter}
-        - config: {get_resource: write_prometheus_configs}
         - config: {get_resource: install_prometheus}
+        - config: {get_resource: install_docker_compose}
+        - config: {get_resource: install_gitlab}
         - config: {get_resource: master_wc_notify}
 
   ## Server and port
@@ -192,12 +209,12 @@ resources:
     type: "OS::Neutron::Port"
     properties:
       network_id:
-        get_resource: fixed_network
+        get_resource: network
       security_groups:
         - {get_resource: secgroup_default}
       fixed_ips:
         - subnet_id:
-            get_resource: fixed_subnet
+            get_resource: subnet
 
   swarm_master_floating:
     type: "OS::Neutron::FloatingIP"
@@ -224,7 +241,22 @@ outputs:
     description: >
       Security group id
 
-  fixed_subnet:
-    value: { get_resource: fixed_subnet }
+  network:
+    value: { get_resource: network }
+    description: >
+      Fixed network for swarm cluster
+
+  subnet:
+    value: { get_resource: subnet }
     description: >
       Fixed subnet for swarm cluster
+
+  swarm_worker_token:
+    value: {'Fn::Select': ['worker', { get_attr: [master_wait_condition, data]}]}
+    description: >
+      Swarm worker tokens to join cluster
+
+  swarm_manager_token:
+    value: {'Fn::Select': ['manager', { get_attr: [master_wait_condition, data]}]}
+    description: >
+      Swarm worker tokens to join cluster
