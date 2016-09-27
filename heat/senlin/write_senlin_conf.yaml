@@ -1,0 +1,33 @@
+#cloud-config
+
+write_files:
+  - path: /etc/senlin/senlin.conf
+    owner: "root:root"
+    permissions: "0644"
+    content: |
+      [database]
+      connection = mysql://senlin:${MYSQL_SENLIN_PW}@127.0.0.1/senlin?charset=utf8
+      
+      [keystone_authtoken]
+      auth_uri = http://${HOST_IP}:5000/v3
+      auth_version = 3
+      cafile = /opt/stack/data/ca-bundle.pem
+      identity_uri = http://${HOST_IP}:35357
+      admin_user = senlin
+      admin_password = ${SENLIN_PASSWORD}
+      admin_tenant_name = service
+      
+      [authentication]
+      auth_url = http://${HOST_IP}:5000/v3
+      service_username = senlin
+      service_password = ${SENLIN_PASSWORD}
+      service_project_name = service
+      
+      [oslo_messaging_rabbit]
+      rabbit_userid = ${RABBIT_USER_ID}
+      rabbit_hosts = ${HOST_IP}
+      rabbit_password = ${RABBIT_PASSWORD}
+      
+      [oslo_messaging_notifications]
+      driver = messaging
+

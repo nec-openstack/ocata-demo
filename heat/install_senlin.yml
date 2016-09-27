@@ -1,0 +1,140 @@
+heat_template_version: 2013-05-23
+
+parameters:
+
+  ## Required parameters
+
+  key_name:
+    type: string
+    default: demo_key
+
+  external_network:
+    type: string
+    description: uuid/name of a network to use for floating ip addresses
+    default: public
+
+  image:
+    type: string
+    default: ubuntu-docker
+
+  flavor:
+    type: string
+    default: m2.middle
+
+  subnet:
+    type: string
+    default: DEFAULT_NETWORK_SUB
+
+  http_proxy:
+    type: string
+    default: ""
+
+  https_proxy:
+    type: string
+    default: ""
+
+  fixed_network:
+    type: string
+    default: 10.0.1.0/24
+
+  senlin_password:
+    type: string
+    default: openstackadmin
+
+  host_ip:
+    type: string
+    default: 172.16.50.11
+
+  mysql_senlin_pw:
+    type: string
+    default: senlin
+
+  rabbit_user_id:
+    type: string
+    default: nova
+
+  rabbit_password:
+    type: string
+    default: openstackadmin
+
+resources:
+
+  server_port:
+    type: OS::Neutron::Port
+    properties:
+      network: {get_param: fixed_network}
+      fixed_ips:
+        - subnet:
+            get_param: subnet
+      security_groups: [{get_resource: security_group}]
+
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: senlin_security_group
+      rules:
+        - protocol: icmp
+        - protocol: tcp
+        - protocol: udp
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: {get_param: external_network}
+      port_id: {get_resource: server_port}
+      fixed_ip_address: {get_attr: [server_port, fixed_ips, 0, ip_address]}
+
+  senlin_installer:
+    type: OS::Nova::Server
+    properties:
+      image:
+        get_param: image
+      flavor:
+        get_param: flavor
+      key_name:
+        get_param: key_name
+      user_data_format: RAW
+      user_data: {get_resource: senlin_config}
+      networks:
+        - port:
+            get_resource: server_port
+
+  senlin_conf:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: 
+        str_replace:
+          template: {get_file: senlin/write_senlin_conf.yaml}
+        params:
+          "$MYSQL_SENLIN_PW": {get_param: mysql_senlin_pw}
+          "$HOST_IP": {get_param: host_ip}
+          "$SENLIN_PASSWORD": {get_param: senlin_password}
+          "$RABBIT_USER_ID": {get_param: rabbit_user_id}
+          "$RABBIT_PASSWORD": {get_param: rabbit_password}
+
+  policy_file:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: senlin/write_policy_json.yaml}
+
+  api-paste:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: senlin/write_api_paste.yaml}
+
+  senlin_setup:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+        - config: {get_resource: senlin_conf}
+        - config: {get_resource: policy_file}
+        - config: {get_resource: api-paste}
+
+outputs:
+  floating_ip:
+    value: {get_attr: [floating_ip, floating_ip_address]}
+  fixed_ip:
+    value: {get_attr: [floating_ip, fixed_ips, 0, ip_address]}
