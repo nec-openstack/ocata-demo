@@ -136,12 +136,6 @@ resources:
             "$PROMETHEUS_CONFIG": {get_file: '../prometheus/prometheus.yml'}
             "$PROMETHEUS_ALERT_CONFIG": {get_file: '../prometheus/alert.rules'}
 
-  install_docker_compose:
-    type: OS::Heat::SoftwareConfig
-    properties:
-      group: ungrouped
-      config: {get_file: fragments/60-install-docker-compose.sh}
-
   install_gitlab:
     type: OS::Heat::SoftwareConfig
     properties:
@@ -166,7 +160,6 @@ resources:
         - config: {get_resource: configure_docker}
         - config: {get_resource: install_consul_server}
         - config: {get_resource: install_prometheus}
-        - config: {get_resource: install_docker_compose}
         - config: {get_resource: install_gitlab}
         - config: {get_resource: master_wc_notify}
 

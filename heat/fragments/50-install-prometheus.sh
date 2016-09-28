@@ -2,6 +2,10 @@
 
 . /etc/sysconfig/heat-params
 
+CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
+docker load < ${CONTAINER_TAR_DIRECTORY}/prometheus.tar
+docker load < ${CONTAINER_TAR_DIRECTORY}/alertmanager.tar
+
 PROMETHEUS_CONF_DIR="/srv/docker/prometheus"
 PROMETHEUS_CONF=${PROMETHEUS_CONF_DIR}/prometheus.yml
 PROMETHEUS_ALERT_CONF=${PROMETHEUS_CONF_DIR}/alert.rules

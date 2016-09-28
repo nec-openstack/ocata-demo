@@ -2,6 +2,9 @@
 
 . /etc/sysconfig/heat-params
 
+CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
+docker load < ${CONTAINER_TAR_DIRECTORY}/cadvisor.tar
+
 docker run \
     --restart always \
     --volume=/:/rootfs:ro \
