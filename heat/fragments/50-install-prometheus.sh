@@ -10,7 +10,11 @@ PROMETHEUS_CONF_DIR="/srv/docker/prometheus"
 PROMETHEUS_CONF=${PROMETHEUS_CONF_DIR}/prometheus.yml
 PROMETHEUS_ALERT_CONF=${PROMETHEUS_CONF_DIR}/alert.rules
 
+ALERTMANAGER_CONF_DIR="/srv/docker/alertmanager"
+ALERTMANAGER_CONF=${ALERTMANAGER_CONF_DIR}/alertmanager.yml
+
 mkdir -p ${PROMETHEUS_CONF_DIR}
+mkdir -p ${ALERTMANAGER_CONF_DIR}
 
 cat > ${PROMETHEUS_CONF} <<EOF
 $PROMETHEUS_CONFIG
@@ -18,6 +22,10 @@ EOF
 
 cat > ${PROMETHEUS_ALERT_CONF} <<EOF
 $PROMETHEUS_ALERT_CONFIG
+EOF
+
+cat > ${ALERTMANAGER_CONF} <<EOF
+$ALERTMANAGER_CONFIG
 EOF
 
 docker run \
@@ -36,6 +44,7 @@ docker run \
 
 docker run \
     --restart always \
+    --volume=${ALERTMANAGER_CONF}:/etc/alertmanager/config.yml \
     --net=host \
     --detach=true \
     --name alertmanager \

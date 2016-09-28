@@ -135,6 +135,7 @@ resources:
           params:
             "$PROMETHEUS_CONFIG": {get_file: '../prometheus/prometheus.yml'}
             "$PROMETHEUS_ALERT_CONFIG": {get_file: '../prometheus/alert.rules'}
+            "$ALERTMANAGER_CONFIG": {get_file: '../alertmanager/alertmanager.yml'}
 
   install_gitlab:
     type: OS::Heat::SoftwareConfig
