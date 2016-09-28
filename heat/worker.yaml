@@ -39,6 +39,12 @@ parameters:
   consul_registrator:
     type: string
     default: registrator
+  http_proxy:
+    type: string
+    default: ""
+  https_proxy:
+    type: string
+    default: ""
 
 resources:
   swarm_worker:
