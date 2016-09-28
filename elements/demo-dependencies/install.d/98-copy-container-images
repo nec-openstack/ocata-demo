@@ -9,12 +9,12 @@ set -o pipefail
 CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
 mkdir -p $CONTAINER_TAR_DIRECTORY
 
-mv /tmp/in_target.d/consul.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/cadvisor.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/node-exporter.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/prometheus.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/alertmanager.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/ubuntu-ruby.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/redis.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/postgresql.tar $CONTAINER_TAR_DIRECTORY
-mv /tmp/in_target.d/gitlab.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/consul.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/cadvisor.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/node-exporter.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/prometheus.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/alertmanager.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/ubuntu-ruby.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/redis.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/postgresql.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/gitlab.tar $CONTAINER_TAR_DIRECTORY
