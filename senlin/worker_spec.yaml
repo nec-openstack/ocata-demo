@@ -7,7 +7,6 @@
 type: os.heat.stack
 version: 1.0
 properties:
-  name: worker
   template: "../heat/worker.yaml"
   parameters:
     key_name: default

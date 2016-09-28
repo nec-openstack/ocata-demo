@@ -53,7 +53,6 @@ resources:
       key_name: { get_param: key_name }
       image: { get_param: image }
       flavor: { get_param: flavor }
-      name: worker
       networks:
         - port: { get_resource: swarm_worker_eth0 }
       user_data_format: RAW
