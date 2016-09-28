@@ -1,0 +1,15 @@
+type: os.heat.stack
+version: 1.0
+properties:
+  name: worker
+  template: "../heat/worker.yaml"
+  parameters:
+    key_name: default
+    external_network: public
+    image: ubuntu-docker
+    flavor: m1.small
+    dns_nameserver: 8.8.8.8
+    http_proxy: ""
+    https_proxy: ""
+  context:
+    region_name: RegionOne
