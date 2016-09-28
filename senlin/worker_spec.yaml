@@ -1,3 +1,9 @@
+# SWARM_SG=`heat output-show -F raw swarm-manager security_group`
+# SWARM_MANAGER_IP=`heat output-show -F raw swarm-manager fixed_ip`
+# SWARM_TOKEN=`heat output-show -F raw swarm-manager swarm_worker_token`
+# sed -i -e "s|__SWARM_SG__|${SWARM_SG}|g\" ./worker_spec.yaml
+# sed -i -e "s|__SWARM_MANAGER_IP__|${SWARM_MANAGER_IP}|g\" ./worker_spec.yaml
+# sed -i -e "s|__SWARM_TOKEN__|${SWARM_TOKEN}|g\" ./worker_spec.yaml
 type: os.heat.stack
 version: 1.0
 properties:
@@ -8,7 +14,11 @@ properties:
     external_network: public
     image: ubuntu-docker
     flavor: m1.small
-    dns_nameserver: 8.8.8.8
+    network: swarm-net
+    subnet: swarm-subnet
+    security_group: __SWARM_SG__
+    swarm_server: __SWARM_MANAGER_IP__
+    swarm_token: __SWARM_TOKEN__
     http_proxy: ""
     https_proxy: ""
   context:
