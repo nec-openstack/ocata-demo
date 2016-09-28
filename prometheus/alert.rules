@@ -1,6 +1,6 @@
 ALERT HighMemoryAlert
   IF sum((node_memory_MemTotal - node_memory_MemFree) / 1024 / 1024) / sum(up{job="node"}) > 500
-  FOR 1m
+  FOR 10s
   LABELS {}
   ANNOTATIONS {
     summary = "High Memory usage for a container",
