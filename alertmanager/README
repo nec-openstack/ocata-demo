@@ -1,5 +1,6 @@
 ## Create a profile(pro_worker) for docker-worker
- # Using worker template(../heat/work.yml)
+ # Using worker template(./heat/work.yml)
+ $ senlin profile-create -s ./heat/worker.spec pro_worker
 
 ## Create a cluster
  $ senlin cluster-create -p pro_worker cluster_con
