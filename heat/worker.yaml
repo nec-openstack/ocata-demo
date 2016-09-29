@@ -89,7 +89,7 @@ resources:
               docker load < ${CONTAINER_TAR_DIRECTORY}/alertmanager.tar
               docker load < ${CONTAINER_TAR_DIRECTORY}/ubuntu-ruby.tar
               docker load < ${CONTAINER_TAR_DIRECTORY}/gitlab-runner.tar
-            else
+            fi
 
             sudo docker swarm join --token $swarm_token $swarm_server:$swarm_port
             # install consul agent
