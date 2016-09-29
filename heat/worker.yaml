@@ -45,8 +45,24 @@ parameters:
   https_proxy:
     type: string
     default: ""
+  wait_condition_timeout:
+    type: number
+    description: >
+      timeout for the Wait Conditions
+    default: 6000
 
 resources:
+
+  worker_wait_handle:
+    type: OS::Heat::WaitConditionHandle
+
+  worker_wait_condition:
+    type: OS::Heat::WaitCondition
+    depends_on: swarm_worker
+    properties:
+      handle: {get_resource: worker_wait_handle}
+      timeout: {get_param: wait_condition_timeout}
+
   swarm_worker:
     type: OS::Nova::Server
     properties:
@@ -112,12 +128,14 @@ resources:
               -collector.procfs /host/proc \
               -collector.sysfs /host/sys \
               -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"
+            sh -c "$wait_curl --data-binary '{\"status\": \"SUCCESS\"}'"
           params:
             $swarm_token: { get_param: swarm_token }
             $swarm_server: { get_param: swarm_server }
             $swarm_port: { get_param: swarm_port }
             $consul_agent: { get_param: consul_agent }
             $consul_registrator: { get_param: consul_registrator }
+            $wait_curl: {get_attr: [worker_wait_handle, curl_cli]}
 
   swarm_worker_eth0:
     type: OS::Neutron::Port
