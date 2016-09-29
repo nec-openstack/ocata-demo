@@ -40,7 +40,8 @@ docker run \
     -config.file=/etc/prometheus/prometheus.yml \
     -storage.local.path=/prometheus \
     -web.console.libraries=/etc/prometheus/console_libraries \
-    -web.console.templates=/etc/prometheus/consoles
+    -web.console.templates=/etc/prometheus/consoles \
+    -query.staleness-delta=10s
 
 docker run \
     --restart always \
