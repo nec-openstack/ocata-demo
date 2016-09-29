@@ -1,5 +1,6 @@
 #!/bin/bash
 
+senlin receiver-delete scale-in-receiver
 senlin receiver-delete scale-out-receiver
 senlin cluster-delete swarm-worker
 sleep 1

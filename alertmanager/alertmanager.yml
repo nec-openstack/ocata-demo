@@ -25,7 +25,7 @@ route:
 receivers:
 - name: 'scale-out'
   webhook_configs:
-  - url: "http://172.16.6.59:8778/v1/webhooks/4bb56da2-2a40-45a1-bd55-f8b35206c211/trigger?V=1"
+  - url: "SENLIN_OUT_RECEIVER_URL"
 - name: 'scale-in'
   webhook_configs:
-  - url: "http://172.16.6.59:8778/v1/webhooks/eb0fcdeb-095e-4165-9d18-ffcd2ede4dd0/trigger?V=1"
+  - url: "SENLIN_IN_RECEIVER_URL"

@@ -23,15 +23,22 @@ senlin profile-create -s worker_spec.tmp.yaml swarm-worker-profile
 senlin cluster-create -p swarm-worker-profile swarm-worker
 
 senlin receiver-create -c swarm-worker -a CLUSTER_SCALE_OUT scale-out-receiver
+senlin receiver-create -c swarm-worker -a CLUSTER_SCALE_IN scale-in-receiver
 
 ALERTMANAGER_CONF_DIR="/srv/docker/alertmanager"
 ALERTMANAGER_CONF=${ALERTMANAGER_CONF_DIR}/alertmanager.yml
 SWARM_MANAGER_FIP=`heat output-show -F raw swarm-manager floating_ip`
-HOOK_URL=`openstack cluster receiver show scale-out-receiver \
+SCALE_OUT_HOOK_URL=`openstack cluster receiver show scale-out-receiver \
               -c channel -f value | \
             grep alarm_url | \
             sed -e "s/.*\(http.*V\=1\).*/\1/"`
-echo "sudo sed -i -e \"s|SENLIN_SERVER_RECEIVER_URL|${HOOK_URL}|g\" \
+echo "sudo sed -i -e \"s|SENLIN_OUT_RECEIVER_URL|${SCALE_OUT_HOOK_URL}|g\" \
+    ${ALERTMANAGER_CONF}" | ssh ubuntu@${SWARM_MANAGER_FIP} bash
+SCALE_IN_HOOK_URL=`openstack cluster receiver show scale-in-receiver \
+              -c channel -f value | \
+            grep alarm_url | \
+            sed -e "s/.*\(http.*V\=1\).*/\1/"`
+echo "sudo sed -i -e \"s|SENLIN_IN_RECEIVER_URL|${SCALE_IN_HOOK_URL}|g\" \
     ${ALERTMANAGER_CONF}" | ssh ubuntu@${SWARM_MANAGER_FIP} bash
 
 ssh ubuntu@${SWARM_MANAGER_FIP} sudo docker restart alertmanager
