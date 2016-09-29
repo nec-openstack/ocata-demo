@@ -1,0 +1,8 @@
+parameters:
+  key_name: demo_key
+  external_network: public
+  image: ubuntu-docker
+  flavor: m2.medium
+  dns_nameserver: 10.31.68.81
+  http_proxy: ""
+  https_proxy: ""

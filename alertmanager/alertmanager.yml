@@ -1,4 +1,3 @@
-
 global:
 
 # The root route on which each incoming alert enters.
@@ -13,11 +12,20 @@ route:
   # resend them.
   repeat_interval: 3h
 
-  # A default receiver
-  receiver: 'senlin'
+  receiver: "scale-out"
 
+  routes:
+  - match:
+      alertname: ContainerQuantityOver
+    receiver: scale-out
+  - match:
+      alertname: ContainerIdle
+    receiver: scale-in
 
 receivers:
-- name: 'senlin'
+- name: 'scale-out'
   webhook_configs:
-  - url: "SENLIN_SERVER_RECEIVER_URL"
+  - url: "http://172.16.6.59:8778/v1/webhooks/4bb56da2-2a40-45a1-bd55-f8b35206c211/trigger?V=1"
+- name: 'scale-in'
+  webhook_configs:
+  - url: "http://172.16.6.59:8778/v1/webhooks/eb0fcdeb-095e-4165-9d18-ffcd2ede4dd0/trigger?V=1"
