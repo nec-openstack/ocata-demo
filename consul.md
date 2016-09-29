@@ -43,7 +43,6 @@
         -v "/proc:/host/proc" \
         -v "/sys:/host/sys" \
         -v "/:/rootfs" \
-        --net="host" \
         --name=node-exporter \
         prom/node-exporter \
         -collector.procfs /host/proc \
