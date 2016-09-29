@@ -15,7 +15,7 @@ cd ~/ocata-demo/senlin
 SWARM_SG=`heat output-show -F raw swarm-manager security_group`
 SWARM_MANAGER_IP=`heat output-show -F raw swarm-manager fixed_ip`
 SWARM_TOKEN=`heat output-show -F raw swarm-manager swarm_worker_token`
-sed -e "s/__SWARM_SG__/${SWARM_SG}/g" > ./worker_spec.tmp.yaml
+sed -e "s/__SWARM_SG__/${SWARM_SG}/g" ./worker_spec.yaml > ./worker_spec.tmp.yaml
 sed -i -e "s/__SWARM_MANAGER_IP__/${SWARM_MANAGER_IP}/g" ./worker_spec.tmp.yaml
 sed -i -e "s/__SWARM_TOKEN__/${SWARM_TOKEN}/g" ./worker_spec.tmp.yaml
 senlin profile-create -s worker_spec.tmp.yaml swarm-worker-profile
