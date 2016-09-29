@@ -10,7 +10,7 @@ Demo for ocata
 
 ### Install devstack
 
-    $ cp ~/ocata-demo/devstack/local.conf ~/devstack/
+    $ cp ~/ocata-demo/devstack/controller/local.* ~/devstack/
     $ cd ~/devstack
     $ ./stack.sh
 
