@@ -20,5 +20,6 @@ properties:
     swarm_token: __SWARM_TOKEN__
     http_proxy: ""
     https_proxy: ""
+    load_cached_image: "False"
   context:
     region_name: RegionOne
