@@ -104,7 +104,7 @@ resources:
               -v "/proc:/host/proc" \
               -v "/sys:/host/sys" \
               -v "/:/rootfs" \
-              --net="host" \
+              --publish=9100:9100 \
               --name=node-exporter \
               prom/node-exporter \
               -collector.procfs /host/proc \
