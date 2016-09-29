@@ -8,4 +8,4 @@ senlin profile-delete swarm-worker-profile
 heat stack-delete -y swarm-manager
 
 nova flavor-delete m.swarm
-nova flavor-delete s.swarm
+nova flavor-delete w.swarm
