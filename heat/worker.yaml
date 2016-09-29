@@ -50,6 +50,9 @@ parameters:
     description: >
       timeout for the Wait Conditions
     default: 6000
+  load_cached_image:
+    type: string
+    default: "True"
 
 resources:
 
@@ -76,17 +79,17 @@ resources:
         str_replace:
           template: |
             #!/bin/bash
-            CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
-            docker load < ${CONTAINER_TAR_DIRECTORY}/consul.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/registrator.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/cadvisor.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/node-exporter.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/prometheus.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/alertmanager.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/ubuntu-ruby.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/redis.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/postgresql.tar
-            docker load < ${CONTAINER_TAR_DIRECTORY}/gitlab.tar
+            LOAD_CACHED_IMAGE="$load_cached_image"
+            if [ "$LOAD_CACHED_IMAGE" == "True" ]; then
+              CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
+              docker load < ${CONTAINER_TAR_DIRECTORY}/consul.tar
+              docker load < ${CONTAINER_TAR_DIRECTORY}/registrator.tar
+              docker load < ${CONTAINER_TAR_DIRECTORY}/cadvisor.tar
+              docker load < ${CONTAINER_TAR_DIRECTORY}/node-exporter.tar
+              docker load < ${CONTAINER_TAR_DIRECTORY}/alertmanager.tar
+              docker load < ${CONTAINER_TAR_DIRECTORY}/ubuntu-ruby.tar
+              docker load < ${CONTAINER_TAR_DIRECTORY}/gitlab-runner.tar
+            else
 
             sudo docker swarm join --token $swarm_token $swarm_server:$swarm_port
             # install consul agent
@@ -136,6 +139,7 @@ resources:
             $consul_agent: { get_param: consul_agent }
             $consul_registrator: { get_param: consul_registrator }
             $wait_curl: {get_attr: [worker_wait_handle, curl_cli]}
+            $load_cached_image: { get_param: load_cached_image }
 
   swarm_worker_eth0:
     type: OS::Neutron::Port

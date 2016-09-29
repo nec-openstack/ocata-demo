@@ -19,3 +19,4 @@ cp /tmp/in_target.d/ubuntu-ruby.tar $CONTAINER_TAR_DIRECTORY
 cp /tmp/in_target.d/redis.tar $CONTAINER_TAR_DIRECTORY
 cp /tmp/in_target.d/postgresql.tar $CONTAINER_TAR_DIRECTORY
 cp /tmp/in_target.d/gitlab.tar $CONTAINER_TAR_DIRECTORY
+cp /tmp/in_target.d/gitlab-runner.tar $CONTAINER_TAR_DIRECTORY

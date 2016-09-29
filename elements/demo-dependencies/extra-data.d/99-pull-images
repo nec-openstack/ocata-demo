@@ -26,3 +26,5 @@ sudo docker pull sameersbn/postgresql:9.5-1
 docker save sameersbn/postgresql:9.5-1 > $TMP_HOOKS_PATH/postgresql.tar
 sudo docker pull sameersbn/gitlab:8.11.4
 docker save sameersbn/gitlab:8.11.4 > $TMP_HOOKS_PATH/gitlab.tar
+sudo docker pull yuanying/gitlab-runner:latest
+docker save yuanying/gitlab-runner:latest > $TMP_HOOKS_PATH/gitlab-runner.tar

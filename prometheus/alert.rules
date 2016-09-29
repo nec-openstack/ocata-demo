@@ -1,10 +1,8 @@
-ALERT HighMemoryAlert
-  IF sum((node_memory_MemTotal - node_memory_MemFree) / 1024 / 1024) / sum(up{job="node"}) > 500
-  FOR 10s
+ALERT ContainerOverLoadAlert
+  IF sum(container_tasks_state{state='running', image!=''}+1) / sum(up{job="node"})
+  FOR 3m
   LABELS {}
   ANNOTATIONS {
-    summary = "High Memory usage for a container",
+    summary = "Over loaded for a container",
     description = "High Memory usage on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
   }
-
-# sum((node_memory_MemTotal - node_memory_MemFree) / 1024 / 1024) / sum(up{job="node"})

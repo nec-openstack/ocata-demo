@@ -77,3 +77,10 @@ Demo for ocata
     $ senlin cluster-scale-out -c 1 swarm-worker
 
 ## Setup gitlab
+
+## Test Demo
+
+    $ docker service create \
+        --constraint 'node.role != manager' \
+        yuanying/ubuntu-ruby:2.3.1 \
+        sleep 100
