@@ -90,6 +90,7 @@ resources:
             # install cAdvisor
             sudo docker run \
               --restart always \
+              -e "SERVICE_NAME=cadvisor" \
               --volume=/:/rootfs:ro \
               --volume=/var/run:/var/run:rw \
               --volume=/sys:/sys:ro \
@@ -99,7 +100,8 @@ resources:
               --name=cadvisor \
               google/cadvisor:latest
             # install node-exporter
-            sudo docker run -d -e "SERVICE_NAME=node" \
+            sudo docker run -d \
+              -e "SERVICE_NAME=node" \
               --restart always \
               -v "/proc:/host/proc" \
               -v "/sys:/host/sys" \

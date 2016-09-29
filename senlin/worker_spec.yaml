@@ -12,7 +12,7 @@ properties:
     key_name: default
     external_network: public
     image: ubuntu-docker
-    flavor: m1.small
+    flavor: w.swarm
     network: swarm-net
     subnet: swarm-subnet
     security_group: __SWARM_SG__

@@ -39,6 +39,7 @@ Demo for ocata
 ### Create a profile for docker-worker
 
     $ cd ~/ocata-demo/senlin
+    $ nova flavor-create w.swarm wm 1024 20 1
     $ SWARM_SG=`heat output-show -F raw swarm-manager security_group`
     $ SWARM_MANAGER_IP=`heat output-show -F raw swarm-manager fixed_ip`
     $ SWARM_TOKEN=`heat output-show -F raw swarm-manager swarm_worker_token`
