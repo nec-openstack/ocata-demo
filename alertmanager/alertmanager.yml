@@ -10,17 +10,17 @@ route:
 
   # If an alert has successfully been sent, wait 'repeat_interval' to
   # resend them.
-  repeat_interval: 3h
+  repeat_interval: 1m
 
   receiver: "scale-out"
 
   routes:
   - match:
       alertname: ContainerQuantityOver
-    receiver: scale-out
+    receiver: 'scale-out'
   - match:
       alertname: ContainerIdle
-    receiver: scale-in
+    receiver: 'scale-in'
 
 receivers:
 - name: 'scale-out'

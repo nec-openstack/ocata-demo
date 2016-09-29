@@ -1,15 +1,16 @@
 ALERT ContainerQuantityOver
-  IF sum(container_tasks_state{state='running',image!=''}+1)/sum(up{job='node'}) > 5
+  IF sum(up{job='node'}) * 5 - sum(container_tasks_state{state='running',image!=''}+1) < 1
   FOR 20s
-  LABELS {}
+  LABELS {action = "scale-out"}
   ANNOTATIONS {
     summary = "High Memory usage for a container",
     description = "High Memory usage on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
   }
 
 ALERT ContainerIdle
-  IF sum(container_tasks_state{state='running',image!=''}+1)/sum(up{job='node'}) < 5
+  IF sum(container_tasks_state{state='running',image!=''}+1) - sum(up{job='node'}) * 5 < -1
   FOR 20s
+  LABELS {action = "scale-in"}
   ANNOTATIONS {
     summary = "Too many resources wasted",
     description = "Too much memory {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
