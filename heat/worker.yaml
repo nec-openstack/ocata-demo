@@ -145,6 +145,8 @@ resources:
             $consul_registrator: { get_param: consul_registrator }
             $wait_curl: {get_attr: [worker_wait_handle, curl_cli]}
             $load_cached_image: { get_param: load_cached_image }
+            $http_proxy: { get_param: http_proxy }
+            $https_proxy: { get_param: https_proxy }
 
   swarm_worker_eth0:
     type: OS::Neutron::Port
