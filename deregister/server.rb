@@ -29,7 +29,10 @@ def unregister_gitlab(node, conf)
 
   runners.each do |runner|
     if node == runner['description']
-      RestClient.delete("#{gitlab_url}/api/v3/runners/#{runner['id']}")
+      RestClient.delete(
+        "#{gitlab_url}/api/v3/runners/#{runner['id']}",
+        { "PRIVATE-TOKEN" => gitlab_token }
+      )
     end
   end
 end
