@@ -13,6 +13,8 @@ docker run -d --net=host --name consul-server \
 DEREGISTER_CONF_DIR="/srv/docker/deregister"
 DEREGISTER_CONF=${DEREGISTER_CONF_DIR}/config.yml
 
+mkdir -p ${DEREGISTER_CONF_DIR}
+
 cat > ${DEREGISTER_CONF} <<'EOF'
 $DEREGISTER_CONFIG
 EOF
