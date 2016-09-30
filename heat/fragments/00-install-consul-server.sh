@@ -23,6 +23,7 @@ EOF
 docker run -d --net=host \
     --restart always \
     --name deregister \
-    --volume=${DEREGISTER_CONF}:/app/config.yaml \
+    --volume=${DEREGISTER_CONF}:/app/config.new.yaml \
+    -e CONFIG_FILE="/app/config.new.yaml" \
     -p 4567:4567 \
     yuanying/deregister
