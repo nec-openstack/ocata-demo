@@ -1,6 +1,6 @@
 ALERT HighMemoryAlert
-  IF sum(node_memory_MemFree / 1024 / 1024) < 300
-  FOR 20s
+  IF sum(node_memory_MemFree / 1024 / 1024) < 150
+  FOR 1m
   LABELS {action = "scale-out"}
   ANNOTATIONS {
     summary = "High Memory usage for a container",
@@ -8,11 +8,11 @@ ALERT HighMemoryAlert
   }
 
 ALERT LowMemoryAlert
-  IF sum(node_memory_MemFree / 1024 / 1024) > 800
-  FOR 20s
+  IF sum(node_memory_MemFree / 1024 / 1024) > 500
+  FOR 1m
   LABELS {action = "scale-in"}
   ANNOTATIONS {
-    summary = "igh Memory usage for a container",
+    summary = "High Memory usage for a container",
     description = "Low memory {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
   }
 
