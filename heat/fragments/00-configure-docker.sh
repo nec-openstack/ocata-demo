@@ -15,4 +15,6 @@ service docker restart
 sleep 3
 
 docker swarm init
+
+sleep 3
 docker node update --availability drain `hostname`

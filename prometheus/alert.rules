@@ -1,5 +1,5 @@
-ALERT ContainerQuantityOver
-  IF sum(up{job='node'}) * 5 - sum(container_tasks_state{state='running',image!=''}+1) < 1
+ALERT HighMemoryAlert
+  IF sum(node_memory_MemFree / 1024 / 1024) < 300
   FOR 20s
   LABELS {action = "scale-out"}
   ANNOTATIONS {
@@ -7,13 +7,13 @@ ALERT ContainerQuantityOver
     description = "High Memory usage on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
   }
 
-ALERT ContainerIdle
-  IF sum(container_tasks_state{state='running',image!=''}+1) - sum(up{job='node'}) * 5 < -1
+ALERT LowMemoryAlert
+  IF sum(node_memory_MemFree / 1024 / 1024) > 800
   FOR 20s
   LABELS {action = "scale-in"}
   ANNOTATIONS {
-    summary = "Too many resources wasted",
-    description = "Too much memory {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
+    summary = "igh Memory usage for a container",
+    description = "Low memory {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
   }
 
 ALERT MissingJob

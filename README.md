@@ -85,6 +85,24 @@ Demo for ocata
 
 ## Setup gitlab
 
+### Run gitlab runner
+
+    $ export GITLAB_URL="http://172.16.12.12:10080"
+    $ export GITLAB_TOKEN="jsp97U_t9rVZz_vM67u8"
+    $ sudo docker service create --name gitlab-runner \
+      --mode global \
+      --mount type=bind,target=/var/run/docker.sock,source=/var/run/docker.sock \
+      --env="CI_SERVER_URL=${GITLAB_URL}/ci" \
+      --env="REGISTRATION_TOKEN=${GITLAB_TOKEN}" \
+      --env='RUNNER_EXECUTOR=docker' \
+      --env='DOCKER_IMAGE=ruby:2.2' \
+      --env='DOCKER_NETWORK_MODE=host' \
+      --env="DOCKER_VOLUMES=/ci" \
+      --env="DOCKER_PRIVILEGED=true" \
+      --network ingress \
+      --constraint 'node.role != manager' \
+      yuanying/gitlab-runner
+
 ## Test Demo
 
     $ docker service create \

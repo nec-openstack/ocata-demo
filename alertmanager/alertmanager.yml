@@ -16,10 +16,10 @@ route:
 
   routes:
   - match:
-      alertname: ContainerQuantityOver
+      alertname: HighMemoryAlert
     receiver: 'scale-out'
   - match:
-      alertname: ContainerIdle
+      alertname: LowMemoryAlert
     receiver: 'scale-in'
   - match:
       alertname: MissingJob
