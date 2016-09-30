@@ -7,7 +7,6 @@ require 'rest-client'
 
 def unregister_consul(node, conf)
   consul_url = conf['consul_url']
-  node = alert["labels"]["instance"]
   payload = {
     "Node" => node
   }
