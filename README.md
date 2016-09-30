@@ -88,6 +88,8 @@ Demo for ocata
 ## Test Demo
 
     $ docker service create \
+        --name demo \
         --constraint 'node.role != manager' \
         yuanying/ubuntu-ruby:2.3.1 \
         sleep 100
+    $ docker service create --name web nginx
