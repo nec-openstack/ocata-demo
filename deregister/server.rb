@@ -44,6 +44,7 @@ post '/' do
   alerts = params['alerts']
   alerts.each do |alert|
     if alert["labels"]["job"] == "node"
+      node = alert["labels"]["instance"]
       unregister_consul(node, conf)
       unregister_gitlab(node, conf)
     end
