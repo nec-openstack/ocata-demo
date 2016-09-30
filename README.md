@@ -111,6 +111,7 @@ Demo for ocata
     $ DEREGISTER_CONF=${DEREGISTER_CONF_DIR}/config.yml
     $ sudo sed -i -e "s|__GITLAB_TOKEN__|${GITLAB_TOKEN}|g" \
         ${DEREGISTER_CONF}
+    $ sudo docker restart deregister
 
 ## Test Demo
 
