@@ -21,8 +21,14 @@ route:
   - match:
       alertname: ContainerIdle
     receiver: 'scale-in'
+  - match:
+      alertname: MissingJob
+    receiver: 'cleanup-job'
 
 receivers:
+- name: 'cleanup-job'
+  webhook_configs:
+  - url: "http://localhost:4567"
 - name: 'scale-out'
   webhook_configs:
   - url: "SENLIN_OUT_RECEIVER_URL"
