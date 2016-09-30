@@ -123,7 +123,11 @@ resources:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
-      config: {get_file: fragments/00-install-consul-server.sh}
+      config:
+        str_replace:
+          template: {get_file: fragments/00-install-consul-server.sh}
+          params:
+            "$DEREGISTER_CONFIG": {get_file: '../deregister/config.yaml'}
 
   install_prometheus:
     type: OS::Heat::SoftwareConfig

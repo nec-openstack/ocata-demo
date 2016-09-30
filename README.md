@@ -87,8 +87,8 @@ Demo for ocata
 
 ### Run gitlab runner
 
-    $ export GITLAB_URL="http://172.16.12.12:10080"
-    $ export GITLAB_TOKEN="jsp97U_t9rVZz_vM67u8"
+    $ export GITLAB_URL="__RPLACE_GITLAB_URL__"
+    $ export GITLAB_TOKEN="__RPLACE_GITLAB_RUNNER_TOKEN__"
     $ sudo docker service create --name gitlab-runner \
       --mode global \
       --mount type=bind,target=/var/run/docker.sock,source=/var/run/docker.sock \
@@ -103,6 +103,14 @@ Demo for ocata
       --network ingress \
       --constraint 'node.role != manager' \
       yuanying/gitlab-runner
+
+### Config deregister
+
+    $ export GITLAB_TOKEN="__REPLACE_GITLAB_PRIVATE_TOKEN__"
+    $ DEREGISTER_CONF_DIR="/srv/docker/deregister"
+    $ DEREGISTER_CONF=${DEREGISTER_CONF_DIR}/config.yml
+    $ sudo sed -i -e "s|__GITLAB_TOKEN__|${GITLAB_TOKEN}|g" \
+        ${DEREGISTER_CONF}
 
 ## Test Demo
 
