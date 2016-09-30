@@ -92,6 +92,7 @@ Demo for ocata
     $ sudo docker service create --name gitlab-runner \
       --mode global \
       --mount type=bind,target=/var/run/docker.sock,source=/var/run/docker.sock \
+      --mount type=bind,target=/etc/hostname,source=/etc/hostname \
       --env="CI_SERVER_URL=${GITLAB_URL}/ci" \
       --env="REGISTRATION_TOKEN=${GITLAB_TOKEN}" \
       --env='RUNNER_EXECUTOR=docker' \
