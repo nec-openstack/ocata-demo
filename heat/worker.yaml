@@ -91,10 +91,13 @@ resources:
               docker load < ${CONTAINER_TAR_DIRECTORY}/gitlab-runner.tar
             fi
 
-            echo "http_proxy=$http_proxy" >> /etc/default/docker
-            echo "https_proxy=$https_proxy" >> /etc/default/docker
-            echo "HTTP_PROXY=$http_proxy" >> /etc/default/docker
-            echo "HTTPS_PROXY=$https_proxy" >> /etc/default/docker
+            echo "export http_proxy=$http_proxy" >> /etc/default/docker
+            echo "export https_proxy=$https_proxy" >> /etc/default/docker
+            echo "export HTTP_PROXY=$http_proxy" >> /etc/default/docker
+            echo "export HTTPS_PROXY=$https_proxy" >> /etc/default/docker
+
+            service docker restart
+            sleep 3
 
             sudo docker swarm join --token $swarm_token $swarm_server:$swarm_port
             # install consul agent
