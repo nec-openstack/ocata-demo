@@ -9,4 +9,5 @@ COPY config.ru /app/config.ru
 COPY Procfile /app/Procfile
 EXPOSE 4567
 RUN bundler
+ENV CONSUL_URL=http://localhost:8500
 CMD ["foreman", "start", "-d", "/app", "-f", "/app/Procfile", "-p", "4567"]
