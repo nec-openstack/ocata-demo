@@ -87,14 +87,14 @@ Demo for ocata
 
 ### Run gitlab runner
 
-    $ export GITLAB_URL="__RPLACE_GITLAB_URL__"
-    $ export GITLAB_TOKEN="__RPLACE_GITLAB_RUNNER_TOKEN__"
+    $ export GITLAB_URL="__RRPLACE_GITLAB_URL__"
+    $ export GITLAB_RUNNER_TOKEN="__RRPLACE_GITLAB_RUNNER_TOKEN__"
     $ sudo docker service create --name gitlab-runner \
       --mode global \
       --mount type=bind,target=/var/run/docker.sock,source=/var/run/docker.sock \
       --mount type=bind,target=/etc/hostname,source=/etc/hostname \
       --env="CI_SERVER_URL=${GITLAB_URL}/ci" \
-      --env="REGISTRATION_TOKEN=${GITLAB_TOKEN}" \
+      --env="REGISTRATION_TOKEN=${GITLAB_RUNNER_TOKEN}" \
       --env='RUNNER_EXECUTOR=docker' \
       --env='DOCKER_IMAGE=ruby:2.2' \
       --env='DOCKER_NETWORK_MODE=host' \
@@ -104,6 +104,9 @@ Demo for ocata
       --constraint 'node.role != manager' \
       yuanying/gitlab-runner
 
+-   `GITLAB_URL` is `http://${SWARM_MANAGER_FIP}`.
+-   `GITLAB_RUNNER_TOKEN` is gotten from `${GITLAB_URL}/admin/runners`
+
 ### Config deregister
 
     $ export GITLAB_TOKEN="__REPLACE_GITLAB_PRIVATE_TOKEN__"
@@ -112,6 +115,9 @@ Demo for ocata
     $ sudo sed -i -e "s|__GITLAB_TOKEN__|${GITLAB_TOKEN}|g" \
         ${DEREGISTER_CONF}
     $ sudo docker restart deregister
+
+-   `GITLAB_TOKEN` is private token from gitlab which is gotten from
+    `${GITLAB_URL}/profile/account`.
 
 ## Test Demo
 
