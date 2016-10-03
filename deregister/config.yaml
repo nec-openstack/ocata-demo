@@ -1,4 +1,4 @@
 consul_url: "http://localhost:8500"
 
 gitlab_url: "http://localhost:10080"
-gitlab_token: "__GITLAB_TOKEN__"
+gitlab_token: "GITLAB_PRIVATE_TOKEN"
