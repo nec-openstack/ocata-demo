@@ -23,6 +23,6 @@ ALERT NoNodesAlert
 
 ALERT MissingJob
   If up < 1
-  FOR 20s
+  FOR 5m
 
 # sum((node_memory_MemTotal - node_memory_MemFree) / 1024 / 1024) / sum(up{job="node"})
