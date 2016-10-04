@@ -117,7 +117,11 @@ resources:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
-      config: {get_file: fragments/00-configure-docker.sh}
+      config:
+        str_replace:
+          template: {get_file: fragments/00-configure-docker.sh}
+          params:
+            "$REGISTRY_CONFIG": {get_file: '../docker/registry.yml'}
 
   install_consul_server:
     type: OS::Heat::SoftwareConfig
