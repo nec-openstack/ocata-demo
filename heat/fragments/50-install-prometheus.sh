@@ -50,3 +50,5 @@ docker run \
     --detach=true \
     --name alertmanager \
     prom/alertmanager:latest
+
+docker run -d --name=grafana -p 3000:3000 grafana/grafana
