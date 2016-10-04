@@ -8,13 +8,18 @@ ALERT HighMemoryAlert
   }
 
 ALERT LowMemoryAlert
-  IF (sum(up{job="node"}) * 1024) - (sum(container_memory_rss) / 1024 / 1024) > 1276
+  IF (sum(up{job="node"}) * 1024) - (sum(container_memory_rss) / 1024 / 1024) > 1536
   FOR 5m
   LABELS {action = "scale-in"}
   ANNOTATIONS {
     summary = "High Memory usage for a container",
     description = "Low memory {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
   }
+
+ALERT NoNodesAlert
+  IF absent(up{job='node'})
+  For 1m
+  LABELS {action = "scale-out"}
 
 ALERT MissingJob
   If up < 1

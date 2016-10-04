@@ -2,24 +2,28 @@ global:
 
 # The root route on which each incoming alert enters.
 route:
+  # How long to initially wait to send a notification for a group
+  # of alerts. Allows to wait for an inhibiting alert to arrive or collect
+  # more initial alerts for the same group. (Usually ~0s to few minutes.)
   group_wait: 30s
 
-  # When the first notification was sent, wait 'group_interval' to send a batch
-  # of new alerts that started firing for that group.
+  # How long to wait before sending notification about new alerts that are
+  # in are added to a group of alerts for which an initial notification
+  # has already been sent. (Usually ~5min or more.)
   group_interval: 5m
 
-  # If an alert has successfully been sent, wait 'repeat_interval' to
-  # resend them.
-  repeat_interval: 1m
+  # How long to wait before sending a notification again if it has already
+  # been sent successfully for an alert. (Usually ~3h or more).
+  repeat_interval: 2h
 
   receiver: "scale-out"
 
   routes:
   - match:
-      alertname: HighMemoryAlert
+      action: 'scale-out'
     receiver: 'scale-out'
   - match:
-      alertname: LowMemoryAlert
+      action: 'scale-in'
     receiver: 'scale-in'
   - match:
       alertname: MissingJob
