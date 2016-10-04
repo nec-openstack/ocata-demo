@@ -1,6 +1,6 @@
 ALERT HighMemoryAlert
   IF (sum(up{job="node"}) * 1024) - (sum(container_memory_rss) / 1024 / 1024) < 512
-  FOR 1m
+  FOR 3m
   LABELS {action = "scale-out"}
   ANNOTATIONS {
     summary = "High Memory usage for a container",
@@ -9,7 +9,7 @@ ALERT HighMemoryAlert
 
 ALERT LowMemoryAlert
   IF (sum(up{job="node"}) * 1024) - (sum(container_memory_rss) / 1024 / 1024) > 1276
-  FOR 1m
+  FOR 5m
   LABELS {action = "scale-in"}
   ANNOTATIONS {
     summary = "High Memory usage for a container",
