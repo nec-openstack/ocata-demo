@@ -1,5 +1,5 @@
 ALERT HighMemoryAlert
-  IF sum(node_memory_MemFree / 1024 / 1024) < 150
+  IF (sum(up{job="node"}) * 1024) - (sum(container_memory_rss) / 1024 / 1024) < 512
   FOR 1m
   LABELS {action = "scale-out"}
   ANNOTATIONS {
@@ -8,7 +8,7 @@ ALERT HighMemoryAlert
   }
 
 ALERT LowMemoryAlert
-  IF sum(node_memory_MemFree / 1024 / 1024) > 500
+  IF (sum(up{job="node"}) * 1024) - (sum(container_memory_rss) / 1024 / 1024) > 1276
   FOR 1m
   LABELS {action = "scale-in"}
   ANNOTATIONS {
