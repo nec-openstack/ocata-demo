@@ -16,8 +16,13 @@ ALERT LowMemoryAlert
     description = "Low memory {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
   }
 
+ALERT NoNodesAlert
+  IF absent(up{job='node'})
+  For 1m
+  LABELS {action = "scale-out"}
+
 ALERT MissingJob
   If up < 1
-  FOR 1m
+  FOR 5m
 
 # sum((node_memory_MemTotal - node_memory_MemFree) / 1024 / 1024) / sum(up{job="node"})
