@@ -123,7 +123,7 @@ resources:
   worker_register_deployment:
     type: OS::Heat::SoftwareDeployment
     properties:
-      server:  {get_param: swarm_worker}
+      server:  {get_resource: swarm_worker}
       config: {get_resource: worker_register_config}
       actions: ['CREATE']
 
@@ -143,7 +143,7 @@ resources:
   worker_unregister_deployment:
     type: OS::Heat::SoftwareDeployment
     properties:
-      server:  {get_param: swarm_worker}
+      server:  {get_resource: swarm_worker}
       config: {get_resource: worker_unregister_config}
       actions: ['DELETE']
 
