@@ -79,17 +79,6 @@ resources:
         str_replace:
           template: |
             #!/bin/bash
-            # LOAD_CACHED_IMAGE="$load_cached_image"
-            # if [ "$LOAD_CACHED_IMAGE" == "True" ]; then
-            #   CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
-            #   docker load < ${CONTAINER_TAR_DIRECTORY}/consul.tar
-            #   docker load < ${CONTAINER_TAR_DIRECTORY}/registrator.tar
-            #   docker load < ${CONTAINER_TAR_DIRECTORY}/cadvisor.tar
-            #   docker load < ${CONTAINER_TAR_DIRECTORY}/node-exporter.tar
-            #   docker load < ${CONTAINER_TAR_DIRECTORY}/alertmanager.tar
-            #   docker load < ${CONTAINER_TAR_DIRECTORY}/ubuntu-ruby.tar
-            #   docker load < ${CONTAINER_TAR_DIRECTORY}/gitlab-runner.tar
-            # fi
 
             echo "export DOCKER_OPTS='--registry-mirror=http://$swarm_server:5000'" >> /etc/default/docker
 

@@ -2,9 +2,6 @@
 
 . /etc/sysconfig/heat-params
 
-CONTAINER_TAR_DIRECTORY=/srv/docker/tars/
-docker load < ${CONTAINER_TAR_DIRECTORY}/consul.tar
-
 docker run -d --net=host --name consul-server \
     --restart always \
     -e 'CONSUL_LOCAL_CONFIG={"skip_leave_on_interrupt": true}' \
