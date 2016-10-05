@@ -1,4 +1,4 @@
-heat_template_version: 2013-05-23
+heat_template_version: 2015-04-30
 
 parameters:
   key_name:
@@ -56,15 +56,93 @@ parameters:
 
 resources:
 
-  worker_wait_handle:
-    type: OS::Heat::WaitConditionHandle
-
-  worker_wait_condition:
-    type: OS::Heat::WaitCondition
-    depends_on: swarm_worker
+  worker_component:
+    type: OS::Heat::SoftwareComponent
     properties:
-      handle: {get_resource: worker_wait_handle}
-      timeout: {get_param: wait_condition_timeout}
+      configs:
+        - actions: [CREATE]
+          config:
+            str_replace:
+              template: |
+                #!/bin/bash
+
+                echo "export DOCKER_OPTS='--registry-mirror=http://$swarm_server:5000'" >> /etc/default/docker
+
+                service docker restart
+                sleep 3
+
+                sudo docker swarm join --token $swarm_token $swarm_server:$swarm_port
+                # install consul agent
+                sudo docker run -d --net=host --name $consul_agent \
+                  --restart always \
+                  -e 'CONSUL_BIND_INTERFACE=eth0' \
+                  -e 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}' \
+                  consul agent -join $swarm_server
+                # install consul registrator
+                sudo docker run -d \
+                  --restart always \
+                  --name=$consul_registrator \
+                  --net=host \
+                  --volume=/var/run/docker.sock:/tmp/docker.sock \
+                  gliderlabs/registrator:latest \
+                  consul://localhost:8500
+                # install cAdvisor
+                sudo docker run \
+                  --restart always \
+                  -e "SERVICE_NAME=cadvisor" \
+                  --volume=/:/rootfs:ro \
+                  --volume=/var/run:/var/run:rw \
+                  --volume=/sys:/sys:ro \
+                  --volume=/var/lib/docker/:/var/lib/docker:ro \
+                  --publish=8080:8080 \
+                  --detach=true \
+                  --name=cadvisor \
+                  google/cadvisor:latest
+                # install node-exporter
+                sudo docker run -d \
+                  -e "SERVICE_NAME=node" \
+                  --restart always \
+                  -v "/proc:/host/proc" \
+                  -v "/sys:/host/sys" \
+                  -v "/:/rootfs" \
+                  --publish=9100:9100 \
+                  --name=node-exporter \
+                  prom/node-exporter \
+                  -collector.procfs /host/proc \
+                  -collector.sysfs /host/sys \
+                  -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"
+              params:
+                $swarm_token: { get_param: swarm_token }
+                $swarm_server: { get_param: swarm_server }
+                $swarm_port: { get_param: swarm_port }
+                $consul_agent: { get_param: consul_agent }
+                $consul_registrator: { get_param: consul_registrator }
+                $load_cached_image: { get_param: load_cached_image }
+                $http_proxy: { get_param: http_proxy }
+                $https_proxy: { get_param: https_proxy }
+          tool: script
+        - actions: [DELETE]
+          config: |
+            #!/bin/bash
+            msg="DELETE invoked at `date +"%d/%m/%Y %H:%M:%S:%N"`"
+            echo $msg >> /tmp/sw-component-actions
+            echo "DELETE" > $heat_outputs_path.last_action
+
+            docker stop cadvisor
+            docker rm cadvisor
+            docker stop node-expoter
+            docker rm node-exporter
+            docker swarm leave
+          tool: script
+      outputs:
+        - name: last_action
+
+  worker_deployment:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config: { get_resource: worker_component }
+      server: { get_resource: swarm_worker }
+      signal_transport: HEAT_SIGNAL
 
   swarm_worker:
     type: OS::Nova::Server
@@ -74,68 +152,8 @@ resources:
       flavor: { get_param: flavor }
       networks:
         - port: { get_resource: swarm_worker_eth0 }
-      user_data_format: RAW
-      user_data:
-        str_replace:
-          template: |
-            #!/bin/bash
-
-            echo "export DOCKER_OPTS='--registry-mirror=http://$swarm_server:5000'" >> /etc/default/docker
-
-            service docker restart
-            sleep 3
-
-            sudo docker swarm join --token $swarm_token $swarm_server:$swarm_port
-            # install consul agent
-            sudo docker run -d --net=host --name $consul_agent \
-              --restart always \
-              -e 'CONSUL_BIND_INTERFACE=eth0' \
-              -e 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}' \
-              consul agent -join $swarm_server
-            # install consul registrator
-            sudo docker run -d \
-              --restart always \
-              --name=$consul_registrator \
-              --net=host \
-              --volume=/var/run/docker.sock:/tmp/docker.sock \
-              gliderlabs/registrator:latest \
-              consul://localhost:8500
-            # install cAdvisor
-            sudo docker run \
-              --restart always \
-              -e "SERVICE_NAME=cadvisor" \
-              --volume=/:/rootfs:ro \
-              --volume=/var/run:/var/run:rw \
-              --volume=/sys:/sys:ro \
-              --volume=/var/lib/docker/:/var/lib/docker:ro \
-              --publish=8080:8080 \
-              --detach=true \
-              --name=cadvisor \
-              google/cadvisor:latest
-            # install node-exporter
-            sudo docker run -d \
-              -e "SERVICE_NAME=node" \
-              --restart always \
-              -v "/proc:/host/proc" \
-              -v "/sys:/host/sys" \
-              -v "/:/rootfs" \
-              --publish=9100:9100 \
-              --name=node-exporter \
-              prom/node-exporter \
-              -collector.procfs /host/proc \
-              -collector.sysfs /host/sys \
-              -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"
-            sh -c "$wait_curl --data-binary '{\"status\": \"SUCCESS\"}'"
-          params:
-            $swarm_token: { get_param: swarm_token }
-            $swarm_server: { get_param: swarm_server }
-            $swarm_port: { get_param: swarm_port }
-            $consul_agent: { get_param: consul_agent }
-            $consul_registrator: { get_param: consul_registrator }
-            $wait_curl: {get_attr: [worker_wait_handle, curl_cli]}
-            $load_cached_image: { get_param: load_cached_image }
-            $http_proxy: { get_param: http_proxy }
-            $https_proxy: { get_param: https_proxy }
+      user_data_format: SOFTWARE_CONFIG
+      software_config_transport: POLL_SERVER_HEAT
 
   swarm_worker_eth0:
     type: OS::Neutron::Port
