@@ -1,6 +1,6 @@
 # How to install
 
-    git clone https://github.com/yuanying/ocata-demo.git
+    git clone https://github.com/nec-openstack/ocata-demo.git
     git clone https://git.openstack.org/openstack/diskimage-builder.git
     git clone https://git.openstack.org/openstack/tripleo-image-elements.git
     git clone https://git.openstack.org/openstack/heat-templates.git
