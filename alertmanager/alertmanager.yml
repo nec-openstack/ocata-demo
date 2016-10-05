@@ -33,9 +33,12 @@ receivers:
 - name: 'cleanup-job'
   webhook_configs:
   - url: "http://localhost:4567"
+    send_resolved: false
 - name: 'scale-out'
   webhook_configs:
   - url: "SENLIN_OUT_RECEIVER_URL"
+    send_resolved: false
 - name: 'scale-in'
   webhook_configs:
   - url: "SENLIN_IN_RECEIVER_URL"
+    send_resolved: false
