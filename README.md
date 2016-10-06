@@ -18,6 +18,10 @@ This repository containes conceptual model to manage docker swarm / kubernetes c
 
     $ nova keypair-add --pub-key ~/.ssh/id_rsa.pub default
 
+### Assign heat stack owner to admin
+
+    $ openstack role add --project admin --user admin heat_stack_owner
+
 ### Get OS image and register to Glance
 
     $ curl -O https://fedorapeople.org/groups/magnum/ubuntu-trusty-docker.qcow2

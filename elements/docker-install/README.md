@@ -17,6 +17,7 @@
           os-refresh-config \
           os-apply-config \
           heat-config \
+          heat-config-cfn-init \
           heat-config-script \
           docker-install \
           pip-and-virtualenv \

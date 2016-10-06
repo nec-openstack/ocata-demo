@@ -7,6 +7,10 @@ set -o pipefail
 nova flavor-create m.swarm sm 4096 40 1
 nova flavor-create w.swarm wm 1024 20 1
 
+openstack role add --project admin --user admin heat_stack_owner
+openstack role add --project demo --user demo heat_stack_owner
+
+
 cd ~/ocata-demo/heat
 
 heat stack-create --poll -f manager.yaml -e manager-params.yaml swarm-manager
