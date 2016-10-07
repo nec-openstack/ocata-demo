@@ -4,6 +4,7 @@
 
 docker run -d --net=host --name consul-server \
     --restart always \
+    -p 8500:8500 \
     -e 'CONSUL_LOCAL_CONFIG={"skip_leave_on_interrupt": true}' \
     consul agent -server -bind=0.0.0.0 -advertise=${MANAGER_IP} \
                 -bootstrap-expect=1 -ui
