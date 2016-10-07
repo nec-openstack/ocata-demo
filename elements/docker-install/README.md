@@ -21,7 +21,6 @@
           heat-config-script \
           docker-install \
           pip-and-virtualenv \
-          demo-dependencies \
           -o ubuntu-trusty-docker.qcow2
 
     glance image-create --name ubuntu-docker \
