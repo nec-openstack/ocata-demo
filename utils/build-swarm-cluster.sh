@@ -22,6 +22,30 @@ senlin profile-create -s worker_spec.tmp.yaml swarm-worker-profile
 
 senlin cluster-create -p swarm-worker-profile swarm-worker
 
+cat > deletion_policy.yaml <<EOF
+# Sample deletion policy that can be attached to a cluster.
+type: senlin.policy.deletion
+version: 1.0
+description: A policy for choosing victim node(s) from a cluster for deletion.
+properties:
+  # The valid values include:
+  # OLDEST_FIRST, OLDEST_PROFILE_FIRST, YOUNGEST_FIRST, RANDOM
+  criteria: YOUNGEST_FIRST
+
+  # Whether deleted node should be destroyed
+  destroy_after_deletion: True
+
+  # Length in number of seconds before the actual deletion happens
+  # This param buys an instance some time before deletion
+  grace_period: 60
+
+  # Whether the deletion will reduce the desired capacity of
+  # the cluster as well
+  reduce_desired_capacity: False
+EOF
+senlin policy-create -s deletion_policy.yaml worker-deletion-policy
+senlin cluster-policy-attach -p worker-deletion-policy swarm-worker
+
 senlin receiver-create -c swarm-worker -a CLUSTER_SCALE_OUT scale-out-receiver
 senlin receiver-create -c swarm-worker -a CLUSTER_SCALE_IN scale-in-receiver
 
