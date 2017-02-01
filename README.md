@@ -1,12 +1,12 @@
-# ocata-demo
-Demo for ocata
+# swarm-on-openstack
+This repository containes conceptual model to manage docker swarm / kubernetes cluster using OpenStack Senlin.
 
 ## Common
 
 ### Clone devstack and ocata-demo repository
 
     $ git clone https://git.openstack.org/openstack-dev/devstack ~/devstack
-    $ git clone https://github.com/nec-openstack/ocata-demo ~/ocata-demo
+    $ git clone https://github.com/nec-openstack/swarm-on-openstack ~/ocata-demo
 
 ### Install devstack
 
